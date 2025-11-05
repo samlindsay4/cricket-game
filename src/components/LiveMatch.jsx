@@ -103,8 +103,8 @@ const LiveMatch = ({ onNavigate }) => {
         handleInningsComplete()
       }
       
-      // Force re-render
-      setMatchState({ ...matchState })
+      // Force re-render by creating a new reference
+      setMatchState(Object.assign(Object.create(Object.getPrototypeOf(matchState)), matchState))
     } catch (error) {
       console.error('Error simulating ball:', error)
     }
@@ -127,7 +127,7 @@ const LiveMatch = ({ onNavigate }) => {
         rotateBowler()
       }
       
-      setMatchState({ ...matchState })
+      setMatchState(Object.assign(Object.create(Object.getPrototypeOf(matchState)), matchState))
     } catch (error) {
       console.error('Error simulating over:', error)
     } finally {
@@ -157,13 +157,13 @@ const LiveMatch = ({ onNavigate }) => {
         
         // Update UI every 10 balls
         if (ballCount % 10 === 0) {
-          setMatchState({ ...matchState })
+          setMatchState(Object.assign(Object.create(Object.getPrototypeOf(matchState)), matchState))
           await new Promise(resolve => setTimeout(resolve, 50))
         }
       }
       
       handleInningsComplete()
-      setMatchState({ ...matchState })
+      setMatchState(Object.assign(Object.create(Object.getPrototypeOf(matchState)), matchState))
     } catch (error) {
       console.error('Error fast forwarding:', error)
     } finally {
@@ -191,7 +191,7 @@ const LiveMatch = ({ onNavigate }) => {
           matchState.bowler = matchState.bowlingTeam.players[0]
         }
         
-        setMatchState({ ...matchState })
+        setMatchState(Object.assign(Object.create(Object.getPrototypeOf(matchState)), matchState))
         setMatchPhase('playing')
       }, 2000)
     } else {
