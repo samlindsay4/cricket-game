@@ -82,7 +82,7 @@ const TestMatchScorecard = ({
               fontSize: '0.85rem',
               color: '#FFFF00'
             }}>
-              EXTRAS: {extras} (W {extras.w || 0}, NB {extras.nb || 0}, B {extras.b || 0}, LB {extras.lb || 0})
+              EXTRAS: {(extras.w || 0) + (extras.nb || 0) + (extras.b || 0) + (extras.lb || 0)} (W {extras.w || 0}, NB {extras.nb || 0}, B {extras.b || 0}, LB {extras.lb || 0})
             </div>
           )}
         </div>
