@@ -5,6 +5,7 @@ import MainMenu from './components/MainMenu'
 import MatchScorecard from './components/MatchScorecard'
 import TeletextButton from './components/TeletextButton'
 import LoadingScreen from './components/LoadingScreen'
+import LiveMatch from './components/LiveMatch'
 
 function App() {
   const [isLoading, setIsLoading] = useState(true)
@@ -75,7 +76,7 @@ function App() {
               <TeletextButton color="blue" onClick={() => {}}>
                 CAREER MODE
               </TeletextButton>
-              <TeletextButton color="green" onClick={() => {}}>
+              <TeletextButton color="green" onClick={() => handleNavigate('P300')}>
                 QUICK MATCH
               </TeletextButton>
               <TeletextButton color="yellow" onClick={() => {}}>
@@ -86,7 +87,7 @@ function App() {
 
           <div className="teletext-block teletext-block--yellow">
             <p className="teletext-text teletext-text--black">
-              ⚠ FEATURE IN DEVELOPMENT ⚠
+              ⚠ CAREER MODE & TOURNAMENT IN DEVELOPMENT ⚠
             </p>
           </div>
 
@@ -98,43 +99,7 @@ function App() {
 
       {/* P300 - Match Day */}
       {currentPage === 'P300' && (
-        <TeletextPage pageNumber="P300" title="MATCH DAY - LIVE SCORES">
-          <div className="teletext-block teletext-block--yellow">
-            <h2 className="teletext-subtitle">LIVE MATCH IN PROGRESS</h2>
-          </div>
-
-          <MatchScorecard
-            team1Name="ENGLAND"
-            team1Score="185/4"
-            team1Overs="18.3"
-            team2Name="AUSTRALIA"
-            team2Score="142/8"
-            team2Overs="20.0"
-            batsmen={[
-              { name: "J. ROOT", runs: 47, balls: 32, fours: 4, sixes: 1, status: "*" },
-              { name: "B. STOKES", runs: 23, balls: 18, fours: 2, sixes: 1, status: "" }
-            ]}
-            bowler={{ name: "M. STARC", overs: "3.3", maidens: 0, runs: 28, wickets: 2 }}
-          />
-
-          <div className="teletext-block teletext-block--green">
-            <p className="teletext-text teletext-text--black">
-              🏏 ENGLAND REQUIRE 44 RUNS FROM 9 BALLS 🏏
-            </p>
-          </div>
-
-          <div style={{ marginTop: '1rem' }}>
-            <TeletextButton color="blue" onClick={() => {}}>
-              VIEW FULL SCORECARD
-            </TeletextButton>
-            <TeletextButton color="magenta" onClick={() => {}}>
-              MATCH COMMENTARY
-            </TeletextButton>
-            <TeletextButton color="red" onClick={() => handleNavigate('P100')}>
-              ◄ MAIN MENU
-            </TeletextButton>
-          </div>
-        </TeletextPage>
+        <LiveMatch onNavigate={handleNavigate} />
       )}
 
       {/* P400 - Team Selection */}

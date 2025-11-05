@@ -659,6 +659,96 @@ body::before {
   text-align: center;
 }
 
+/* Match Controls */
+.match-controls {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.match-controls__row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Commentary Feed */
+.teletext-commentary {
+  margin: 1rem 0;
+  border: 2px solid var(--teletext-cyan);
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.teletext-commentary__header {
+  background-color: var(--teletext-cyan);
+  color: var(--teletext-black);
+  padding: 0.5rem;
+  font-weight: bold;
+  text-align: center;
+  font-size: 10px;
+}
+
+.teletext-commentary__feed {
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.commentary-item {
+  padding: 0.5rem;
+  font-size: 9px;
+  line-height: 1.4;
+  border-left: 3px solid transparent;
+}
+
+.commentary-item--normal {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--teletext-white);
+  border-left-color: var(--teletext-white);
+}
+
+.commentary-item--wicket {
+  background-color: rgba(255, 0, 0, 0.3);
+  color: var(--teletext-white);
+  border-left-color: var(--teletext-red);
+  font-weight: bold;
+}
+
+.commentary-item--boundary {
+  background-color: rgba(0, 255, 0, 0.3);
+  color: var(--teletext-white);
+  border-left-color: var(--teletext-green);
+}
+
+.commentary-item--milestone {
+  background-color: rgba(255, 255, 0, 0.3);
+  color: var(--teletext-black);
+  border-left-color: var(--teletext-yellow);
+  font-weight: bold;
+}
+
+/* Scrollbar styling for commentary */
+.teletext-commentary__feed::-webkit-scrollbar {
+  width: 8px;
+}
+
+.teletext-commentary__feed::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.teletext-commentary__feed::-webkit-scrollbar-thumb {
+  background: var(--teletext-cyan);
+  border-radius: 4px;
+}
+
+.teletext-commentary__feed::-webkit-scrollbar-thumb:hover {
+  background: var(--teletext-yellow);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   body {
@@ -689,6 +779,14 @@ body::before {
   
   .teletext-page-header__right {
     font-size: 6px;
+  }
+  
+  .commentary-item {
+    font-size: 7px;
+  }
+  
+  .match-controls__row {
+    flex-direction: column;
   }
 }
 
