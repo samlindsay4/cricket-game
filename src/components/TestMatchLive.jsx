@@ -1,0 +1,519 @@
+import React, { useState, useEffect } from 'react'
+import TeletextPage from './TeletextPage'
+import TestMatchScorecard from './TestMatchScorecard'
+import SessionSummary from './SessionSummary'
+import CommentaryFeed from './CommentaryFeed'
+import TeletextButton from './TeletextButton'
+import { TestMatchState, simulateTestBall } from '../engine/testMatchSimulator.js'
+import { TestProbabilityEngine } from '../engine/testProbabilityEngine.js'
+import { MatchConditions } from '../engine/matchConditions.js'
+import { getEnglandSquad, getAustraliaSquad, selectTestXI, getBowlers, performToss } from '../utils/ashesHelpers.js'
+import { ballsToOvers } from '../engine/matchUtils.js'
+
+/**
+ * TestMatchLive Component
+ * Main component for playing The Ashes 2025 Test match
+ */
+const TestMatchLive = ({ onNavigate }) => {
+  const [matchState, setMatchState] = useState(null)
+  const [probabilityEngine, setProbabilityEngine] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSimulating, setIsSimulating] = useState(false)
+  const [matchPhase, setMatchPhase] = useState('toss')
+  const [tossResult, setTossResult] = useState(null)
+  const [team1Data, setTeam1Data] = useState(null)
+  const [team2Data, setTeam2Data] = useState(null)
+  const [showSessionSummary, setShowSessionSummary] = useState(false)
+  const [sessionSummaryData, setSessionSummaryData] = useState(null)
+  
+  // Initialize match on component mount
+  useEffect(() => {
+    initializeMatch()
+  }, [])
+  
+  const initializeMatch = async () => {
+    setIsLoading(true)
+    setMatchPhase('toss')
+    
+    try {
+      // Load teams
+      const england = getEnglandSquad()
+      const australia = getAustraliaSquad()
+      
+      // Select playing XIs
+      england.players = selectTestXI(england)
+      australia.players = selectTestXI(australia)
+      
+      setTeam1Data(england)
+      setTeam2Data(australia)
+      
+      // Perform toss
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      const toss = performToss()
+      setTossResult(toss)
+      
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      
+      // Determine batting order based on toss
+      let battingTeam, bowlingTeam
+      if ((toss.winner === 1 && toss.decision === 'bat') || (toss.winner === 2 && toss.decision === 'bowl')) {
+        battingTeam = england
+        bowlingTeam = australia
+      } else {
+        battingTeam = australia
+        bowlingTeam = england
+      }
+      
+      // Create match conditions for Test cricket
+      const conditions = MatchConditions.generateRandom('Test')
+      conditions.updatePitchWearByDay(1)
+      
+      // Start match
+      const newMatchState = new TestMatchState(battingTeam, bowlingTeam, conditions)
+      const engine = new TestProbabilityEngine(conditions)
+      
+      // Initialize batsmen
+      newMatchState.initializeBatsmen(battingTeam.players)
+      
+      // Set initial bowler
+      const bowlers = getBowlers(bowlingTeam.players)
+      if (bowlers.length > 0) {
+        newMatchState.bowler = bowlers[0]
+      }
+      
+      setMatchState(newMatchState)
+      setProbabilityEngine(engine)
+      setMatchPhase('playing')
+      setIsLoading(false)
+    } catch (error) {
+      console.error('Error initializing match:', error)
+      setMatchPhase('error')
+      setIsLoading(false)
+    }
+  }
+  
+  // Simulate a single ball
+  const handleNextBall = () => {
+    if (!matchState || !probabilityEngine || isSimulating) return
+    
+    try {
+      const result = simulateTestBall(matchState, probabilityEngine)
+      
+      // Check for session/innings completion
+      if (matchState.isSessionComplete() && !matchState.isInningsComplete()) {
+        handleSessionBreak()
+      } else if (matchState.isInningsComplete()) {
+        handleInningsComplete()
+      }
+      
+      // Force re-render
+      setMatchState(Object.assign(Object.create(Object.getPrototypeOf(matchState)), matchState))
+    } catch (error) {
+      console.error('Error simulating ball:', error)
+    }
+  }
+  
+  // Simulate a full over
+  const handleNextOver = async () => {
+    if (!matchState || !probabilityEngine || isSimulating) return
+    
+    setIsSimulating(true)
+    
+    try {
+      let ballsInOver = 0
+      
+      while (ballsInOver < 6 && !matchState.isInningsComplete() && !matchState.isSessionComplete()) {
+        const result = simulateTestBall(matchState, probabilityEngine)
+        if (result.isLegalDelivery) ballsInOver++
+        
+        await new Promise(resolve => setTimeout(resolve, 50))
+        setMatchState(Object.assign(Object.create(Object.getPrototypeOf(matchState)), matchState))
+      }
+      
+      // Rotate strike at end of over
+      if (ballsInOver === 6 && !matchState.isInningsComplete()) {
+        matchState.rotateStrike()
+        rotateBowler()
+      }
+      
+      // Check for session/innings completion
+      if (matchState.isSessionComplete() && !matchState.isInningsComplete()) {
+        handleSessionBreak()
+      } else if (matchState.isInningsComplete()) {
+        handleInningsComplete()
+      }
+      
+      setMatchState(Object.assign(Object.create(Object.getPrototypeOf(matchState)), matchState))
+    } catch (error) {
+      console.error('Error simulating over:', error)
+    } finally {
+      setIsSimulating(false)
+    }
+  }
+  
+  // Fast forward to end of session
+  const handleNextSession = async () => {
+    if (!matchState || !probabilityEngine || isSimulating) return
+    
+    setIsSimulating(true)
+    
+    try {
+      let ballCount = 0
+      const maxBalls = 180 // 30 overs max per session
+      
+      while (!matchState.isSessionComplete() && !matchState.isInningsComplete() && ballCount < maxBalls) {
+        simulateTestBall(matchState, probabilityEngine)
+        ballCount++
+        
+        // Change bowler every 6-10 overs
+        if (matchState.currentBowlerOvers >= 8) {
+          rotateBowler()
+          matchState.currentBowlerOvers = 0
+        }
+        
+        // Update UI periodically
+        if (ballCount % 30 === 0) {
+          setMatchState(Object.assign(Object.create(Object.getPrototypeOf(matchState)), matchState))
+          await new Promise(resolve => setTimeout(resolve, 100))
+        }
+      }
+      
+      if (matchState.isInningsComplete()) {
+        handleInningsComplete()
+      } else {
+        handleSessionBreak()
+      }
+      
+      setMatchState(Object.assign(Object.create(Object.getPrototypeOf(matchState)), matchState))
+    } catch (error) {
+      console.error('Error fast forwarding:', error)
+    } finally {
+      setIsSimulating(false)
+    }
+  }
+  
+  // Handle session break
+  const handleSessionBreak = () => {
+    const summary = {
+      day: matchState.day,
+      session: matchState.session,
+      teamName: matchState.battingTeam.name,
+      sessionRuns: matchState.score, // Simplified
+      sessionWickets: matchState.wickets,
+      totalRuns: matchState.score,
+      totalWickets: matchState.wickets,
+      overs: ballsToOvers(matchState.balls),
+      wicketsFallen: matchState.fallOfWickets.slice(-3) // Last 3 wickets
+    }
+    
+    setSessionSummaryData(summary)
+    setShowSessionSummary(true)
+  }
+  
+  // Continue from session break
+  const handleContinueFromBreak = () => {
+    setShowSessionSummary(false)
+    matchState.nextSession()
+    setMatchState(Object.assign(Object.create(Object.getPrototypeOf(matchState)), matchState))
+  }
+  
+  // Handle innings completion
+  const handleInningsComplete = () => {
+    if (matchState.isMatchComplete()) {
+      setMatchPhase('complete')
+      return
+    }
+    
+    setMatchPhase('innings_break')
+    
+    setTimeout(() => {
+      matchState.switchInnings()
+      
+      // Initialize new innings batsmen
+      matchState.initializeBatsmen(matchState.battingTeam.players)
+      
+      // Set initial bowler
+      const bowlers = getBowlers(matchState.bowlingTeam.players)
+      if (bowlers.length > 0) {
+        matchState.bowler = bowlers[0]
+        matchState.currentBowlerOvers = 0
+      }
+      
+      setMatchState(Object.assign(Object.create(Object.getPrototypeOf(matchState)), matchState))
+      setMatchPhase('playing')
+    }, 3000)
+  }
+  
+  // Rotate bowler
+  const rotateBowler = () => {
+    const bowlers = getBowlers(matchState.bowlingTeam.players)
+    if (bowlers.length === 0) return
+    
+    const currentIndex = bowlers.findIndex(b => b.id === matchState.bowler.id)
+    const nextIndex = (currentIndex + 1) % Math.min(5, bowlers.length)
+    matchState.bowler = bowlers[nextIndex]
+    matchState.currentBowlerOvers = 0
+  }
+  
+  // Restart match
+  const handleRestartMatch = () => {
+    setMatchState(null)
+    setProbabilityEngine(null)
+    setTossResult(null)
+    setShowSessionSummary(false)
+    initializeMatch()
+  }
+  
+  // Format batsman stats
+  const formatBatsman = (batsman, isStriker = false) => {
+    const stats = matchState.batsmanStats.get(batsman.id)
+    if (!stats) return null
+    
+    return {
+      name: batsman.name,
+      runs: stats.runs,
+      balls: stats.balls,
+      fours: stats.fours,
+      sixes: stats.sixes,
+      status: isStriker ? '*' : ''
+    }
+  }
+  
+  // Format bowler stats
+  const formatBowler = (bowler, isCurrent = false) => {
+    const stats = matchState.getBowlerStats(bowler)
+    return {
+      name: bowler.name,
+      overs: ballsToOvers(stats.balls),
+      maidens: stats.maidens,
+      runs: stats.runs,
+      wickets: stats.wickets,
+      isCurrent
+    }
+  }
+  
+  // Loading screen
+  if (isLoading) {
+    return (
+      <TeletextPage pageNumber="P300" title="THE ASHES 2025">
+        <div className="teletext-block teletext-block--yellow">
+          <h2 className="teletext-subtitle" style={{ color: '#000000' }}>MATCH PREPARATION</h2>
+        </div>
+        
+        <div className="teletext-block">
+          {matchPhase === 'toss' && (
+            <p className="teletext-text teletext-text--cyan">
+              🏏 TOSS IN PROGRESS...
+            </p>
+          )}
+          {tossResult && (
+            <>
+              <p className="teletext-text teletext-text--white">
+                ENGLAND vs AUSTRALIA
+              </p>
+              <p className="teletext-text teletext-text--green">
+                TOSS: {tossResult.winner === 1 ? 'ENGLAND' : 'AUSTRALIA'}
+              </p>
+              <p className="teletext-text teletext-text--yellow">
+                ELECTED TO: {tossResult.decision === 'bat' ? 'BAT FIRST' : 'BOWL FIRST'}
+              </p>
+              <p className="teletext-text teletext-text--cyan">
+                🏏 TEAMS TAKING THE FIELD...
+              </p>
+            </>
+          )}
+        </div>
+      </TeletextPage>
+    )
+  }
+  
+  // Error screen
+  if (matchPhase === 'error') {
+    return (
+      <TeletextPage pageNumber="P300" title="THE ASHES 2025">
+        <div className="teletext-block teletext-block--red">
+          <h2 className="teletext-subtitle">ERROR</h2>
+          <p className="teletext-text teletext-text--white">
+            Unable to load match. Please try again.
+          </p>
+        </div>
+        <TeletextButton color="red" onClick={() => onNavigate('P100')}>
+          ◄ BACK TO MAIN MENU
+        </TeletextButton>
+      </TeletextPage>
+    )
+  }
+  
+  if (!matchState) return null
+  
+  // Session summary screen
+  if (showSessionSummary && sessionSummaryData) {
+    return (
+      <TeletextPage pageNumber="P300" title="THE ASHES 2025">
+        <SessionSummary
+          {...sessionSummaryData}
+          onContinue={handleContinueFromBreak}
+        />
+      </TeletextPage>
+    )
+  }
+  
+  // Innings break screen
+  if (matchPhase === 'innings_break') {
+    const inningsJustCompleted = matchState.inningsNumber - 1
+    const inningsData = matchState.allInnings[
+      inningsJustCompleted === 1 ? 'first' :
+      inningsJustCompleted === 2 ? 'second' :
+      inningsJustCompleted === 3 ? 'third' : 'fourth'
+    ]
+    
+    return (
+      <TeletextPage pageNumber="P300" title="THE ASHES 2025">
+        <div className="teletext-block teletext-block--cyan">
+          <h2 className="teletext-subtitle" style={{ color: '#000000' }}>
+            END OF INNINGS {inningsJustCompleted}
+          </h2>
+        </div>
+        
+        <div className="teletext-block">
+          <p className="teletext-text teletext-text--yellow" style={{ fontSize: '1.2rem' }}>
+            {inningsData.runs}/{inningsData.wickets} ({inningsData.overs} OV)
+          </p>
+          <p className="teletext-text teletext-text--cyan">
+            🏏 INNINGS {matchState.inningsNumber} STARTING...
+          </p>
+        </div>
+      </TeletextPage>
+    )
+  }
+  
+  // Match complete screen
+  if (matchPhase === 'complete') {
+    const result = matchState.determineMatchResult()
+    
+    return (
+      <TeletextPage pageNumber="P300" title="THE ASHES 2025 - RESULT">
+        <div className="teletext-block teletext-block--green">
+          <h2 className="teletext-subtitle">MATCH COMPLETE</h2>
+        </div>
+        
+        <div className="teletext-block teletext-block--yellow">
+          <p className="teletext-text teletext-text--black" style={{ fontSize: '1.2rem' }}>
+            {result.description}
+          </p>
+        </div>
+        
+        <div className="teletext-block">
+          <h3 className="teletext-subtitle">FINAL SCORES</h3>
+          <p className="teletext-text">
+            {matchState.allInnings.first && `${team1Data.name}: ${matchState.allInnings.first.runs}/${matchState.allInnings.first.wickets} & ${matchState.allInnings.third?.runs || 0}/${matchState.allInnings.third?.wickets || 0}`}
+          </p>
+          <p className="teletext-text">
+            {matchState.allInnings.second && `${team2Data.name}: ${matchState.allInnings.second.runs}/${matchState.allInnings.second.wickets} & ${matchState.allInnings.fourth?.runs || 0}/${matchState.allInnings.fourth?.wickets || 0}`}
+          </p>
+        </div>
+        
+        <div style={{ marginTop: '1rem' }}>
+          <TeletextButton color="green" onClick={handleRestartMatch}>
+            NEW MATCH
+          </TeletextButton>
+          <TeletextButton color="red" onClick={() => onNavigate('P100')}>
+            ◄ MAIN MENU
+          </TeletextButton>
+        </div>
+      </TeletextPage>
+    )
+  }
+  
+  // Main match screen
+  const striker = matchState.striker ? formatBatsman(matchState.striker, true) : null
+  const nonStriker = matchState.nonStriker ? formatBatsman(matchState.nonStriker, false) : null
+  const currentBowler = matchState.bowler ? formatBowler(matchState.bowler, true) : null
+  
+  // Get all bowlers who have bowled
+  const allBowlers = Array.from(matchState.bowlerStats.keys())
+    .map(id => matchState.bowlingTeam.players.find(p => p.id === id))
+    .filter(p => p)
+    .map(p => formatBowler(p, p.id === matchState.bowler.id))
+  
+  return (
+    <TeletextPage pageNumber="P300" title="THE ASHES 2025 - LIVE">
+      <div className="teletext-block teletext-block--yellow">
+        <h2 className="teletext-subtitle" style={{ color: '#000000' }}>
+          DAY {matchState.day} - {matchState.getSessionName()}
+        </h2>
+        <div style={{ color: '#000000', fontSize: '0.9rem', marginTop: '0.3rem' }}>
+          {matchState.getMatchStatus()}
+        </div>
+      </div>
+      
+      {/* Current Score */}
+      <div className="teletext-block teletext-block--blue" style={{ marginBottom: '0.5rem' }}>
+        <div style={{ fontSize: '1.4rem', textAlign: 'center', color: '#FFFF00' }}>
+          {matchState.battingTeam.name}: {matchState.score}/{matchState.wickets}
+        </div>
+        <div style={{ textAlign: 'center', color: '#00FF00', fontSize: '0.9rem' }}>
+          ({ballsToOvers(matchState.balls)} OVERS)
+        </div>
+      </div>
+      
+      {/* Scorecard */}
+      {striker && nonStriker && (
+        <TestMatchScorecard
+          teamName={matchState.battingTeam.name}
+          inningsNumber={matchState.inningsNumber}
+          score={matchState.score}
+          wickets={matchState.wickets}
+          overs={ballsToOvers(matchState.balls)}
+          batsmen={[striker, nonStriker]}
+          bowlers={allBowlers.slice(0, 5)}
+          fallOfWickets={matchState.fallOfWickets.slice(-3)}
+        />
+      )}
+      
+      {/* Commentary */}
+      <CommentaryFeed commentary={matchState.commentary} maxItems={4} />
+      
+      {/* Controls */}
+      <div className="teletext-block" style={{ marginTop: '1rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+          <TeletextButton 
+            color="green" 
+            onClick={handleNextBall}
+            disabled={isSimulating}
+          >
+            NEXT BALL
+          </TeletextButton>
+          <TeletextButton 
+            color="cyan" 
+            onClick={handleNextOver}
+            disabled={isSimulating}
+          >
+            NEXT OVER
+          </TeletextButton>
+          <TeletextButton 
+            color="yellow" 
+            onClick={handleNextSession}
+            disabled={isSimulating}
+          >
+            NEXT SESSION
+          </TeletextButton>
+          <TeletextButton 
+            color="blue" 
+            onClick={handleRestartMatch}
+            disabled={isSimulating}
+          >
+            NEW MATCH
+          </TeletextButton>
+        </div>
+        <div style={{ marginTop: '0.5rem' }}>
+          <TeletextButton color="red" onClick={() => onNavigate('P100')}>
+            ◄ BACK TO MAIN MENU
+          </TeletextButton>
+        </div>
+      </div>
+    </TeletextPage>
+  )
+}
+
+export default TestMatchLive

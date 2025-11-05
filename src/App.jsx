@@ -6,6 +6,7 @@ import MatchScorecard from './components/MatchScorecard'
 import TeletextButton from './components/TeletextButton'
 import LoadingScreen from './components/LoadingScreen'
 import LiveMatch from './components/LiveMatch'
+import TestMatchLive from './components/TestMatchLive'
 
 function App() {
   const [isLoading, setIsLoading] = useState(true)
@@ -62,44 +63,52 @@ function App() {
 
       {/* P200 - New Game */}
       {currentPage === 'P200' && (
-        <TeletextPage pageNumber="P200" title="NEW GAME SETUP">
-          <div className="teletext-block teletext-block--green">
-            <h2 className="teletext-subtitle">START NEW CAREER</h2>
-            <p className="teletext-text teletext-text--black">
-              Begin your journey as a cricket captain
-            </p>
-          </div>
-
-          <div className="teletext-block">
-            <h3 className="teletext-subtitle">GAME MODE SELECTION</h3>
-            <div style={{ marginTop: '1rem' }}>
-              <TeletextButton color="blue" onClick={() => {}}>
-                CAREER MODE
-              </TeletextButton>
-              <TeletextButton color="green" onClick={() => handleNavigate('P300')}>
-                QUICK MATCH
-              </TeletextButton>
-              <TeletextButton color="yellow" onClick={() => {}}>
-                TOURNAMENT
-              </TeletextButton>
-            </div>
-          </div>
-
+        <TeletextPage pageNumber="P200" title="THE ASHES 2025">
           <div className="teletext-block teletext-block--yellow">
-            <p className="teletext-text teletext-text--black">
-              ⚠ CAREER MODE & TOURNAMENT IN DEVELOPMENT ⚠
+            <h2 className="teletext-subtitle" style={{ color: '#000000' }}>THE ASHES 2025</h2>
+            <p className="teletext-text teletext-text--black" style={{ fontSize: '1.1rem', marginTop: '0.5rem' }}>
+              ENGLAND vs AUSTRALIA
             </p>
           </div>
 
-          <TeletextButton color="red" onClick={() => handleNavigate('P100')}>
-            ◄ BACK TO MAIN MENU
-          </TeletextButton>
+          <div className="teletext-block teletext-block--blue">
+            <p className="teletext-text teletext-text--white">
+              Experience the greatest rivalry in cricket!
+            </p>
+            <p className="teletext-text teletext-text--cyan" style={{ marginTop: '0.5rem' }}>
+              5-DAY TEST MATCH SIMULATION
+            </p>
+            <ul className="teletext-list" style={{ marginTop: '0.5rem' }}>
+              <li>REALISTIC TEST CRICKET ENGINE</li>
+              <li>ENGLAND & AUSTRALIA SQUADS 2025</li>
+              <li>MULTI-DAY, MULTI-INNINGS FORMAT</li>
+              <li>SESSION BREAKS & SUMMARIES</li>
+              <li>AUTHENTIC CEEFAX EXPERIENCE</li>
+            </ul>
+          </div>
+
+          <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+            <TeletextButton color="green" onClick={() => handleNavigate('P350')}>
+              🏏 START ASHES 2025 🏏
+            </TeletextButton>
+          </div>
+
+          <div style={{ marginTop: '1rem' }}>
+            <TeletextButton color="red" onClick={() => handleNavigate('P100')}>
+              ◄ BACK TO MAIN MENU
+            </TeletextButton>
+          </div>
         </TeletextPage>
       )}
 
-      {/* P300 - Match Day */}
+      {/* P300 - Match Day (Old T20 format - kept for reference) */}
       {currentPage === 'P300' && (
         <LiveMatch onNavigate={handleNavigate} />
+      )}
+
+      {/* P350 - The Ashes 2025 Test Match */}
+      {currentPage === 'P350' && (
+        <TestMatchLive onNavigate={handleNavigate} />
       )}
 
       {/* P400 - Team Selection */}

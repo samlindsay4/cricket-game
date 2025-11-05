@@ -224,14 +224,51 @@ export class MatchConditions {
   /**
    * Update pitch wear as match progresses
    * @param {number} oversPlayed - Number of overs played
+   * @param {string} matchFormat - Type of match (T20, ODI, Test)
    */
-  updatePitchWear(oversPlayed) {
+  updatePitchWear(oversPlayed, matchFormat = 'T20') {
     // Pitch deteriorates as match progresses
     // In T20: minimal wear (max ~30)
     // In ODI: moderate wear (max ~60)
     // In Test: significant wear (max ~100)
-    const wearRate = 0.5; // Adjust based on match format
+    let wearRate = 0.5;
+    
+    if (matchFormat === 'Test') {
+      wearRate = 2.0; // Much faster deterioration in Test cricket
+    } else if (matchFormat === 'ODI') {
+      wearRate = 1.0;
+    }
+    
     this.pitchWear = Math.min(100, this.pitchWear + wearRate);
+  }
+
+  /**
+   * Update pitch wear by day for Test cricket
+   * @param {number} day - Current day (1-5)
+   */
+  updatePitchWearByDay(day) {
+    // Day 1-2: Fresh pitch (0-20% wear)
+    // Day 3: Flattening (30-50% wear)
+    // Day 4-5: Deteriorated (60-100% wear)
+    switch (day) {
+      case 1:
+        this.pitchWear = 5;
+        break;
+      case 2:
+        this.pitchWear = 20;
+        break;
+      case 3:
+        this.pitchWear = 40;
+        break;
+      case 4:
+        this.pitchWear = 65;
+        break;
+      case 5:
+        this.pitchWear = 85;
+        break;
+      default:
+        this.pitchWear = 0;
+    }
   }
 
   /**
