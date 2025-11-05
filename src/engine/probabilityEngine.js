@@ -18,7 +18,8 @@
  * 4. Generate outcome using weighted random selection
  */
 
-import { BALL_OUTCOMES, WICKET_TYPES } from './matchSimulator.js'
+import { BALL_OUTCOMES, WICKET_TYPES } from './matchConstants.js';
+import { generateCommentary } from './commentaryGenerator.js';
 
 /**
  * Base probability distributions (percentages from historical T20 data)
@@ -51,12 +52,8 @@ const WICKET_TYPE_PROBABILITIES = {
  * Probability Engine class
  */
 export class ProbabilityEngine {
-  constructor(matchConditions = {}) {
-    this.conditions = {
-      pitch: matchConditions.pitch || 'normal', // dry, green, dusty, normal
-      weather: matchConditions.weather || 'clear', // clear, overcast, rainy
-      ground: matchConditions.ground || 'medium' // small, medium, large
-    }
+  constructor(matchConditions = null) {
+    this.matchConditions = matchConditions;
   }
 
   /**
@@ -125,6 +122,34 @@ export class ProbabilityEngine {
     adjusted.four *= (1 + formFactor * 0.3)
     adjusted.six *= (1 + formFactor * 0.4)
     
+    // Confidence adjustment
+    const confidenceFactor = (batsman.confidence - 50) / 100
+    adjusted.wicket *= (1 - confidenceFactor * 0.3)
+    adjusted.four *= (1 + confidenceFactor * 0.2)
+    
+    // Match conditions adjustments
+    if (this.matchConditions) {
+      const conditionMods = this.matchConditions.getAllModifiers()
+      const pitchMods = conditionMods.pitch
+      const groundMods = conditionMods.ground
+      
+      // Apply pitch modifiers
+      adjusted.dot *= pitchMods.dot
+      adjusted.single *= pitchMods.single
+      adjusted.four *= pitchMods.boundaries * groundMods.four_probability
+      adjusted.six *= pitchMods.boundaries * groundMods.six_probability
+      adjusted.wicket *= pitchMods.wickets
+      adjusted.two *= groundMods.two_runs
+      adjusted.three *= groundMods.three_runs
+      
+      // Apply bowling effectiveness
+      const bowlingEff = this.matchConditions.getBowlingEffectiveness(bowler.bowling.style)
+      adjusted.wicket *= bowlingEff
+      adjusted.dot *= bowlingEff
+      adjusted.four *= (2 - bowlingEff)
+      adjusted.six *= (2 - bowlingEff)
+    }
+    
     // Pressure situation (death overs)
     const currentOver = Math.floor(matchState.balls / 6)
     if (currentOver >= 15) {
@@ -133,6 +158,21 @@ export class ProbabilityEngine {
       adjusted.four *= 1.2
       adjusted.six *= 1.3
       adjusted.wicket *= 1.3
+    }
+    
+    // Powerplay adjustments (first 6 overs)
+    if (currentOver < 6) {
+      adjusted.four *= 1.2
+      adjusted.six *= 1.1
+      adjusted.dot *= 0.9
+    }
+    
+    // Fatigue effects (bowler stamina)
+    if (bowler.fitness < 70) {
+      const fatigueFactor = (100 - bowler.fitness) / 100
+      adjusted.four *= (1 + fatigueFactor * 0.3)
+      adjusted.six *= (1 + fatigueFactor * 0.3)
+      adjusted.wicket *= (1 - fatigueFactor * 0.2)
     }
     
     // Normalize to ensure total is 100
@@ -184,45 +224,51 @@ export class ProbabilityEngine {
       commentary: ''
     }
     
+    const players = {
+      batsman: batsman.name,
+      bowler: bowler.name,
+      fielder: 'the fielder'
+    };
+    
     switch (outcome) {
       case 'dot':
         result.runs = 0
-        result.commentary = this.generateDotCommentary(batsman, bowler)
+        result.commentary = generateCommentary('dot', players)
         break
       case 'single':
         result.runs = 1
-        result.commentary = `${batsman.name} pushes for a single`
+        result.commentary = generateCommentary('single', players)
         break
       case 'two':
         result.runs = 2
-        result.commentary = `${batsman.name} takes two runs`
+        result.commentary = generateCommentary('two', players)
         break
       case 'three':
         result.runs = 3
-        result.commentary = `${batsman.name} runs hard for three!`
+        result.commentary = generateCommentary('three', players)
         break
       case 'four':
         result.runs = 4
-        result.commentary = `FOUR! ${batsman.name} finds the boundary`
+        result.commentary = generateCommentary('four', players)
         break
       case 'six':
         result.runs = 6
-        result.commentary = `SIX! ${batsman.name} sends it sailing!`
+        result.commentary = generateCommentary('six', players)
         break
       case 'wicket':
         result.isWicket = true
-        result.wicketType = this.determineWicketType()
-        result.commentary = `OUT! ${batsman.name} ${result.wicketType} by ${bowler.name}`
+        result.wicketType = this.determineWicketType(bowler.bowling.style)
+        result.commentary = generateCommentary('wicket', players, {}, result.wicketType)
         break
       case 'wide':
         result.runs = 1
         result.isLegalDelivery = false
-        result.commentary = `Wide ball`
+        result.commentary = generateCommentary('wide', players)
         break
       case 'no_ball':
         result.runs = 1
         result.isLegalDelivery = false
-        result.commentary = `No ball!`
+        result.commentary = generateCommentary('noBall', players)
         break
     }
     
@@ -230,26 +276,26 @@ export class ProbabilityEngine {
   }
 
   /**
-   * Generate varied dot ball commentary
+   * Determine type of wicket based on bowler style
    */
-  generateDotCommentary(batsman, bowler) {
-    const comments = [
-      `${batsman.name} defends`,
-      `Dot ball`,
-      `${bowler.name} beats the bat`,
-      `Good delivery from ${bowler.name}`,
-      `${batsman.name} leaves it alone`,
-      `Defended back to the bowler`
-    ]
-    return comments[Math.floor(Math.random() * comments.length)]
-  }
-
-  /**
-   * Determine type of wicket
-   */
-  determineWicketType() {
-    const wicketType = this.weightedRandomSelection(WICKET_TYPE_PROBABILITIES)
-    return wicketType
+  determineWicketType(bowlingStyle) {
+    let adjustedProbs = { ...WICKET_TYPE_PROBABILITIES };
+    
+    // Adjust wicket probabilities based on bowling style
+    if (bowlingStyle === 'fast' || bowlingStyle === 'fast_medium') {
+      adjustedProbs.bowled *= 1.2;
+      adjustedProbs.caught *= 1.1;
+      adjustedProbs.lbw *= 1.1;
+      adjustedProbs.stumped *= 0.5;
+    } else if (bowlingStyle && bowlingStyle.includes('spin')) {
+      adjustedProbs.stumped *= 2.0;
+      adjustedProbs.caught *= 1.2;
+      adjustedProbs.bowled *= 0.9;
+      adjustedProbs.lbw *= 1.3;
+    }
+    
+    const wicketType = this.weightedRandomSelection(adjustedProbs);
+    return wicketType;
   }
 
   /**

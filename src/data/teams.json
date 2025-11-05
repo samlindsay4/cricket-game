@@ -6,7 +6,7 @@
     "color": "#FF0000",
     "homeGround": "Metropolitan Stadium",
     "captain": "player_001",
-    "squad": [
+    "players": [
       "player_001",
       "player_002",
       "player_003",
@@ -18,27 +18,7 @@
       "player_009",
       "player_010",
       "player_011"
-    ],
-    "playingXI": [
-      "player_001",
-      "player_002",
-      "player_003",
-      "player_004",
-      "player_005",
-      "player_006",
-      "player_007",
-      "player_008",
-      "player_009",
-      "player_010",
-      "player_011"
-    ],
-    "stats": {
-      "matchesPlayed": 24,
-      "wins": 14,
-      "losses": 9,
-      "ties": 1,
-      "points": 29
-    }
+    ]
   },
   {
     "id": "team_002",
@@ -47,7 +27,7 @@
     "color": "#0000FF",
     "homeGround": "Coastal Arena",
     "captain": "player_101",
-    "squad": [
+    "players": [
       "player_101",
       "player_102",
       "player_103",
@@ -59,26 +39,90 @@
       "player_109",
       "player_110",
       "player_111"
-    ],
-    "playingXI": [
-      "player_101",
+    ]
+  },
+  {
+    "id": "team_003",
+    "name": "Mountain Mavericks",
+    "shortName": "MTM",
+    "color": "#00AA00",
+    "homeGround": "Highland Cricket Ground",
+    "captain": "player_201",
+    "players": [
+      "player_201",
+      "player_202",
+      "player_203",
+      "player_204",
+      "player_205",
+      "player_206",
+      "player_207",
+      "player_208",
+      "player_209",
+      "player_210",
+      "player_211"
+    ]
+  },
+  {
+    "id": "team_004",
+    "name": "Desert Dragons",
+    "shortName": "DRD",
+    "color": "#FFA500",
+    "homeGround": "Oasis Stadium",
+    "captain": "player_201",
+    "players": [
+      "player_001",
+      "player_005",
+      "player_007",
       "player_102",
       "player_103",
-      "player_104",
-      "player_105",
       "player_106",
+      "player_201",
+      "player_202",
+      "player_203",
+      "player_204",
+      "player_208"
+    ]
+  },
+  {
+    "id": "team_005",
+    "name": "River Rangers",
+    "shortName": "RVR",
+    "color": "#00FFFF",
+    "homeGround": "Waterside Oval",
+    "captain": "player_101",
+    "players": [
+      "player_002",
+      "player_003",
+      "player_008",
+      "player_009",
+      "player_101",
+      "player_104",
       "player_107",
       "player_108",
       "player_109",
+      "player_205",
+      "player_211"
+    ]
+  },
+  {
+    "id": "team_006",
+    "name": "Forest Fighters",
+    "shortName": "FRF",
+    "color": "#228B22",
+    "homeGround": "Woodland Park",
+    "captain": "player_004",
+    "players": [
+      "player_004",
+      "player_006",
+      "player_010",
+      "player_011",
+      "player_105",
       "player_110",
-      "player_111"
-    ],
-    "stats": {
-      "matchesPlayed": 24,
-      "wins": 12,
-      "losses": 11,
-      "ties": 1,
-      "points": 25
-    }
+      "player_111",
+      "player_206",
+      "player_207",
+      "player_209",
+      "player_210"
+    ]
   }
 ]
