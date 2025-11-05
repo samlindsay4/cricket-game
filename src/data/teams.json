@@ -1,0 +1,84 @@
+[
+  {
+    "id": "team_001",
+    "name": "City Strikers",
+    "shortName": "CTS",
+    "color": "#FF0000",
+    "homeGround": "Metropolitan Stadium",
+    "captain": "player_001",
+    "squad": [
+      "player_001",
+      "player_002",
+      "player_003",
+      "player_004",
+      "player_005",
+      "player_006",
+      "player_007",
+      "player_008",
+      "player_009",
+      "player_010",
+      "player_011"
+    ],
+    "playingXI": [
+      "player_001",
+      "player_002",
+      "player_003",
+      "player_004",
+      "player_005",
+      "player_006",
+      "player_007",
+      "player_008",
+      "player_009",
+      "player_010",
+      "player_011"
+    ],
+    "stats": {
+      "matchesPlayed": 24,
+      "wins": 14,
+      "losses": 9,
+      "ties": 1,
+      "points": 29
+    }
+  },
+  {
+    "id": "team_002",
+    "name": "Harbor Hawks",
+    "shortName": "HRH",
+    "color": "#0000FF",
+    "homeGround": "Coastal Arena",
+    "captain": "player_101",
+    "squad": [
+      "player_101",
+      "player_102",
+      "player_103",
+      "player_104",
+      "player_105",
+      "player_106",
+      "player_107",
+      "player_108",
+      "player_109",
+      "player_110",
+      "player_111"
+    ],
+    "playingXI": [
+      "player_101",
+      "player_102",
+      "player_103",
+      "player_104",
+      "player_105",
+      "player_106",
+      "player_107",
+      "player_108",
+      "player_109",
+      "player_110",
+      "player_111"
+    ],
+    "stats": {
+      "matchesPlayed": 24,
+      "wins": 12,
+      "losses": 11,
+      "ties": 1,
+      "points": 25
+    }
+  }
+]

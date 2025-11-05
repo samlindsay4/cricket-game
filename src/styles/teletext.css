@@ -1,0 +1,258 @@
+/* Ceefax/Teletext Aesthetic Styling */
+
+:root {
+  /* Classic Teletext Colors */
+  --teletext-black: #000000;
+  --teletext-red: #FF0000;
+  --teletext-green: #00FF00;
+  --teletext-yellow: #FFFF00;
+  --teletext-blue: #0000FF;
+  --teletext-magenta: #FF00FF;
+  --teletext-cyan: #00FFFF;
+  --teletext-white: #FFFFFF;
+  
+  /* Background and text defaults */
+  --bg-color: var(--teletext-black);
+  --text-color: var(--teletext-yellow);
+  --header-color: var(--teletext-cyan);
+  --highlight-color: var(--teletext-white);
+  
+  /* Typography */
+  --font-mono: 'Courier New', 'Courier', monospace;
+  
+  /* Spacing based on character grid */
+  --char-width: 1ch;
+  --line-height: 1.5;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-mono);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: var(--line-height);
+  font-size: 16px;
+  overflow-x: hidden;
+}
+
+/* Page Container - Simulating Teletext Page */
+.teletext-page {
+  max-width: 80ch;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  min-height: 100vh;
+}
+
+/* Header Styles */
+.teletext-header {
+  background-color: var(--teletext-blue);
+  color: var(--teletext-white);
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+/* Content Block */
+.teletext-block {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border: 2px solid var(--text-color);
+}
+
+.teletext-block--red {
+  background-color: var(--teletext-red);
+  color: var(--teletext-white);
+}
+
+.teletext-block--green {
+  background-color: var(--teletext-green);
+  color: var(--teletext-black);
+}
+
+.teletext-block--yellow {
+  background-color: var(--teletext-yellow);
+  color: var(--teletext-black);
+}
+
+.teletext-block--blue {
+  background-color: var(--teletext-blue);
+  color: var(--teletext-white);
+}
+
+.teletext-block--magenta {
+  background-color: var(--teletext-magenta);
+  color: var(--teletext-white);
+}
+
+.teletext-block--cyan {
+  background-color: var(--teletext-cyan);
+  color: var(--teletext-black);
+}
+
+/* Title Styles */
+.teletext-title {
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  color: var(--header-color);
+  margin-bottom: 1rem;
+  letter-spacing: 0.1em;
+}
+
+.teletext-subtitle {
+  font-size: 1.2rem;
+  color: var(--teletext-white);
+  margin-bottom: 0.5rem;
+  text-decoration: underline;
+}
+
+/* Text Formatting */
+.teletext-text {
+  color: var(--text-color);
+  white-space: pre-wrap;
+}
+
+.teletext-text--white {
+  color: var(--teletext-white);
+}
+
+.teletext-text--cyan {
+  color: var(--teletext-cyan);
+}
+
+.teletext-text--green {
+  color: var(--teletext-green);
+}
+
+.teletext-text--red {
+  color: var(--teletext-red);
+}
+
+/* List Styles */
+.teletext-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.teletext-list li {
+  padding-left: 2ch;
+  position: relative;
+}
+
+.teletext-list li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--teletext-cyan);
+}
+
+/* Separator */
+.teletext-separator {
+  border: none;
+  border-top: 2px solid var(--text-color);
+  margin: 1rem 0;
+}
+
+/* Button Styles */
+.teletext-button {
+  background-color: var(--teletext-blue);
+  color: var(--teletext-white);
+  border: 2px solid var(--teletext-cyan);
+  padding: 0.5rem 2rem;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  margin: 0.5rem;
+}
+
+.teletext-button:hover {
+  background-color: var(--teletext-cyan);
+  color: var(--teletext-black);
+  border-color: var(--teletext-white);
+}
+
+.teletext-button:active {
+  transform: scale(0.95);
+}
+
+/* Grid Layout for Stats */
+.teletext-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.teletext-stat {
+  padding: 0.5rem;
+  border: 1px solid var(--text-color);
+  text-align: center;
+}
+
+.teletext-stat__label {
+  color: var(--teletext-cyan);
+  font-size: 0.8rem;
+}
+
+.teletext-stat__value {
+  color: var(--teletext-white);
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Footer */
+.teletext-footer {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 2px solid var(--text-color);
+  text-align: center;
+  color: var(--teletext-cyan);
+  font-size: 0.9rem;
+}
+
+/* Flashing Text Animation */
+@keyframes flash {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.teletext-flash {
+  animation: flash 1s infinite;
+}
+
+/* Scrolling text effect */
+.teletext-scroll {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Page number indicator */
+.teletext-page-number {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background-color: var(--teletext-red);
+  color: var(--teletext-white);
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  border: 2px solid var(--teletext-yellow);
+}
+
+/* Loading Screen */
+.teletext-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-size: 2rem;
+  color: var(--teletext-cyan);
+}
