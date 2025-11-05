@@ -10,6 +10,8 @@
  * These conditions modify the base probabilities in the probability engine.
  */
 
+import { BOWLING_STYLES } from './playerStats.js';
+
 /**
  * Pitch type definitions
  */
@@ -254,9 +256,13 @@ export class MatchConditions {
     const pitchMods = this.getPitchModifiers();
     const weatherMods = this.getWeatherModifiers();
     
-    if (bowlingStyle === 'fast' || bowlingStyle === 'fast_medium') {
+    if (bowlingStyle === BOWLING_STYLES.FAST || bowlingStyle === BOWLING_STYLES.FAST_MEDIUM) {
       return pitchMods.pace_effectiveness * weatherMods.pace_effectiveness;
-    } else if (bowlingStyle.includes('spin')) {
+    } else if (
+      bowlingStyle === BOWLING_STYLES.SPIN_OFF ||
+      bowlingStyle === BOWLING_STYLES.SPIN_LEG ||
+      bowlingStyle === BOWLING_STYLES.SPIN_LEFT_ARM
+    ) {
       return pitchMods.spin_effectiveness * weatherMods.spin_effectiveness;
     }
     

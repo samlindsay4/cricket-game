@@ -18,7 +18,7 @@
  * 4. Generate outcome using weighted random selection
  */
 
-import { BALL_OUTCOMES, WICKET_TYPES } from './matchSimulator.js';
+import { BALL_OUTCOMES, WICKET_TYPES } from './matchConstants.js';
 import { generateCommentary } from './commentaryGenerator.js';
 
 /**

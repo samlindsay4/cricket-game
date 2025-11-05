@@ -21,39 +21,14 @@
  */
 
 import { ProbabilityEngine } from './probabilityEngine.js';
-import { Player } from './playerStats.js';
+import { Player, PLAYER_ROLES } from './playerStats.js';
 import { MatchConditions } from './matchConditions.js';
 import { generateOverSummary, generateInningsSummary, generateMatchResult, generateMilestone } from './commentaryGenerator.js';
 import { formatScore, ballsToOvers, isMatchComplete, getMatchWinner, checkMilestone } from './matchUtils.js';
+import { BALL_OUTCOMES, WICKET_TYPES } from './matchConstants.js';
 
-/**
- * Possible ball outcomes
- */
-export const BALL_OUTCOMES = {
-  DOT: 'dot',
-  ONE: '1',
-  TWO: '2',
-  THREE: '3',
-  FOUR: '4',
-  SIX: '6',
-  WICKET: 'wicket',
-  WIDE: 'wide',
-  NO_BALL: 'no_ball',
-  BYE: 'bye',
-  LEG_BYE: 'leg_bye'
-}
-
-/**
- * Wicket types
- */
-export const WICKET_TYPES = {
-  BOWLED: 'bowled',
-  CAUGHT: 'caught',
-  LBW: 'lbw',
-  RUN_OUT: 'run_out',
-  STUMPED: 'stumped',
-  HIT_WICKET: 'hit_wicket'
-}
+// Re-export constants for backward compatibility
+export { BALL_OUTCOMES, WICKET_TYPES };
 
 /**
  * Match state structure
@@ -495,7 +470,7 @@ export function simulateMatch(team1, team2, options = {}) {
   
   // Get bowlers from team2
   const team2Bowlers = team2.players.filter(p => 
-    p.role === 'bowler' || p.role === 'all_rounder'
+    p.role === PLAYER_ROLES.BOWLER || p.role === PLAYER_ROLES.ALL_ROUNDER
   ).slice(0, 5) // Take first 5 bowlers
   
   // Simulate first innings
@@ -509,7 +484,7 @@ export function simulateMatch(team1, team2, options = {}) {
   
   // Get bowlers from team1
   const team1Bowlers = team1.players.filter(p => 
-    p.role === 'bowler' || p.role === 'all_rounder'
+    p.role === PLAYER_ROLES.BOWLER || p.role === PLAYER_ROLES.ALL_ROUNDER
   ).slice(0, 5)
   
   // Simulate second innings
