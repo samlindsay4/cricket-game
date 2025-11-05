@@ -211,6 +211,14 @@ export function generateCommentary(outcome, players, matchContext = {}, wicketTy
     .replace(/{bowler}/g, bowler)
     .replace(/{fielder}/g, fielder);
   
+  // Add ball number prefix if balls count is provided
+  if (matchContext.balls !== undefined) {
+    const overNumber = Math.floor(matchContext.balls / 6);
+    const ballInOver = (matchContext.balls % 6) + 1;
+    const ballLabel = `${overNumber}.${ballInOver}`;
+    commentary = `${ballLabel}: ${commentary}`;
+  }
+  
   // Add context if available
   if (matchContext.addScore) {
     commentary += ` Score: ${matchContext.score}/${matchContext.wickets}`;
