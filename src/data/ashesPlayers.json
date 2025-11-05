@@ -1,0 +1,1168 @@
+[
+  {
+    "id": "eng_crawley",
+    "name": "Z. CRAWLEY",
+    "role": "batsman",
+    "age": 26,
+    "batting": {
+      "timing": 78,
+      "power": 75,
+      "technique": 72,
+      "temperament": 70,
+      "style": "aggressive"
+    },
+    "bowling": {
+      "pace": 30,
+      "accuracy": 25,
+      "variation": 20,
+      "stamina": 40,
+      "style": "medium"
+    },
+    "fielding": {
+      "catching": 80,
+      "throwing": 75,
+      "agility": 78
+    },
+    "mental": {
+      "concentration": 72,
+      "pressure": 75,
+      "adaptability": 76
+    },
+    "form": 75,
+    "fitness": 90,
+    "confidence": 75,
+    "testBattingAverage": 32,
+    "testBowlingAverage": 0,
+    "concentration": 72,
+    "patience": 68
+  },
+  {
+    "id": "eng_duckett",
+    "name": "B. DUCKETT",
+    "role": "batsman",
+    "age": 29,
+    "batting": {
+      "timing": 82,
+      "power": 76,
+      "technique": 78,
+      "temperament": 80,
+      "style": "aggressive"
+    },
+    "bowling": {
+      "pace": 25,
+      "accuracy": 20,
+      "variation": 15,
+      "stamina": 35,
+      "style": "medium"
+    },
+    "fielding": {
+      "catching": 78,
+      "throwing": 72,
+      "agility": 75
+    },
+    "mental": {
+      "concentration": 80,
+      "pressure": 82,
+      "adaptability": 78
+    },
+    "form": 85,
+    "fitness": 92,
+    "confidence": 80,
+    "testBattingAverage": 42,
+    "testBowlingAverage": 0,
+    "concentration": 80,
+    "patience": 75
+  },
+  {
+    "id": "eng_pope",
+    "name": "O. POPE",
+    "role": "batsman",
+    "age": 26,
+    "batting": {
+      "timing": 80,
+      "power": 72,
+      "technique": 82,
+      "temperament": 78,
+      "style": "balanced"
+    },
+    "bowling": {
+      "pace": 20,
+      "accuracy": 15,
+      "variation": 10,
+      "stamina": 30,
+      "style": "medium"
+    },
+    "fielding": {
+      "catching": 85,
+      "throwing": 80,
+      "agility": 82
+    },
+    "mental": {
+      "concentration": 82,
+      "pressure": 78,
+      "adaptability": 80
+    },
+    "form": 78,
+    "fitness": 90,
+    "confidence": 76,
+    "testBattingAverage": 35,
+    "testBowlingAverage": 0,
+    "concentration": 82,
+    "patience": 78
+  },
+  {
+    "id": "eng_root",
+    "name": "J. ROOT",
+    "role": "batsman",
+    "age": 33,
+    "batting": {
+      "timing": 94,
+      "power": 78,
+      "technique": 97,
+      "temperament": 95,
+      "style": "balanced"
+    },
+    "bowling": {
+      "pace": 30,
+      "accuracy": 55,
+      "variation": 50,
+      "stamina": 60,
+      "style": "off_spin"
+    },
+    "fielding": {
+      "catching": 88,
+      "throwing": 82,
+      "agility": 80
+    },
+    "mental": {
+      "concentration": 95,
+      "pressure": 92,
+      "adaptability": 94
+    },
+    "form": 90,
+    "fitness": 88,
+    "confidence": 90,
+    "testBattingAverage": 50,
+    "testBowlingAverage": 45,
+    "concentration": 95,
+    "patience": 92
+  },
+  {
+    "id": "eng_brook",
+    "name": "H. BROOK",
+    "role": "batsman",
+    "age": 25,
+    "batting": {
+      "timing": 88,
+      "power": 90,
+      "technique": 80,
+      "temperament": 82,
+      "style": "aggressive"
+    },
+    "bowling": {
+      "pace": 25,
+      "accuracy": 20,
+      "variation": 15,
+      "stamina": 35,
+      "style": "medium"
+    },
+    "fielding": {
+      "catching": 82,
+      "throwing": 85,
+      "agility": 88
+    },
+    "mental": {
+      "concentration": 80,
+      "pressure": 85,
+      "adaptability": 82
+    },
+    "form": 88,
+    "fitness": 95,
+    "confidence": 85,
+    "testBattingAverage": 45,
+    "testBowlingAverage": 0,
+    "concentration": 80,
+    "patience": 75,
+    "viceCaptain": true
+  },
+  {
+    "id": "eng_stokes",
+    "name": "B. STOKES",
+    "role": "all_rounder",
+    "age": 33,
+    "batting": {
+      "timing": 85,
+      "power": 92,
+      "technique": 82,
+      "temperament": 90,
+      "style": "aggressive"
+    },
+    "bowling": {
+      "pace": 85,
+      "accuracy": 75,
+      "variation": 72,
+      "stamina": 78,
+      "style": "fast_medium"
+    },
+    "fielding": {
+      "catching": 90,
+      "throwing": 88,
+      "agility": 82
+    },
+    "mental": {
+      "concentration": 88,
+      "pressure": 95,
+      "adaptability": 92
+    },
+    "form": 82,
+    "fitness": 80,
+    "confidence": 88,
+    "testBattingAverage": 36,
+    "testBowlingAverage": 32,
+    "concentration": 88,
+    "patience": 80,
+    "captain": true
+  },
+  {
+    "id": "eng_smith",
+    "name": "J. SMITH",
+    "role": "wicket_keeper",
+    "age": 23,
+    "batting": {
+      "timing": 75,
+      "power": 70,
+      "technique": 72,
+      "temperament": 70,
+      "style": "balanced"
+    },
+    "bowling": {
+      "pace": 20,
+      "accuracy": 15,
+      "variation": 10,
+      "stamina": 30,
+      "style": "medium"
+    },
+    "fielding": {
+      "catching": 85,
+      "throwing": 75,
+      "agility": 78
+    },
+    "mental": {
+      "concentration": 75,
+      "pressure": 72,
+      "adaptability": 70
+    },
+    "form": 72,
+    "fitness": 90,
+    "confidence": 70,
+    "testBattingAverage": 28,
+    "testBowlingAverage": 0,
+    "concentration": 75,
+    "patience": 72,
+    "isKeeper": true
+  },
+  {
+    "id": "eng_bethell",
+    "name": "J. BETHELL",
+    "role": "batsman",
+    "age": 21,
+    "batting": {
+      "timing": 72,
+      "power": 68,
+      "technique": 70,
+      "temperament": 68,
+      "style": "balanced"
+    },
+    "bowling": {
+      "pace": 30,
+      "accuracy": 45,
+      "variation": 40,
+      "stamina": 55,
+      "style": "left_arm_spin"
+    },
+    "fielding": {
+      "catching": 75,
+      "throwing": 70,
+      "agility": 78
+    },
+    "mental": {
+      "concentration": 70,
+      "pressure": 68,
+      "adaptability": 72
+    },
+    "form": 70,
+    "fitness": 95,
+    "confidence": 68,
+    "testBattingAverage": 25,
+    "testBowlingAverage": 38,
+    "concentration": 70,
+    "patience": 68
+  },
+  {
+    "id": "eng_jacks",
+    "name": "W. JACKS",
+    "role": "batsman",
+    "age": 25,
+    "batting": {
+      "timing": 74,
+      "power": 78,
+      "technique": 68,
+      "temperament": 70,
+      "style": "aggressive"
+    },
+    "bowling": {
+      "pace": 25,
+      "accuracy": 48,
+      "variation": 45,
+      "stamina": 52,
+      "style": "off_spin"
+    },
+    "fielding": {
+      "catching": 76,
+      "throwing": 72,
+      "agility": 75
+    },
+    "mental": {
+      "concentration": 68,
+      "pressure": 70,
+      "adaptability": 72
+    },
+    "form": 70,
+    "fitness": 92,
+    "confidence": 68,
+    "testBattingAverage": 22,
+    "testBowlingAverage": 42,
+    "concentration": 68,
+    "patience": 65
+  },
+  {
+    "id": "eng_archer",
+    "name": "J. ARCHER",
+    "role": "bowler",
+    "age": 29,
+    "batting": {
+      "timing": 55,
+      "power": 60,
+      "technique": 45,
+      "temperament": 50,
+      "style": "aggressive"
+    },
+    "bowling": {
+      "pace": 97,
+      "accuracy": 80,
+      "variation": 78,
+      "stamina": 75,
+      "style": "fast"
+    },
+    "fielding": {
+      "catching": 75,
+      "throwing": 85,
+      "agility": 82
+    },
+    "mental": {
+      "concentration": 78,
+      "pressure": 82,
+      "adaptability": 80
+    },
+    "form": 78,
+    "fitness": 85,
+    "confidence": 80,
+    "testBattingAverage": 12,
+    "testBowlingAverage": 31,
+    "concentration": 78,
+    "patience": 50,
+    "bowlingType": "pace-fast"
+  },
+  {
+    "id": "eng_atkinson",
+    "name": "G. ATKINSON",
+    "role": "bowler",
+    "age": 26,
+    "batting": {
+      "timing": 50,
+      "power": 55,
+      "technique": 48,
+      "temperament": 52,
+      "style": "defensive"
+    },
+    "bowling": {
+      "pace": 88,
+      "accuracy": 82,
+      "variation": 75,
+      "stamina": 80,
+      "style": "fast_medium"
+    },
+    "fielding": {
+      "catching": 72,
+      "throwing": 78,
+      "agility": 75
+    },
+    "mental": {
+      "concentration": 75,
+      "pressure": 78,
+      "adaptability": 76
+    },
+    "form": 80,
+    "fitness": 90,
+    "confidence": 78,
+    "testBattingAverage": 18,
+    "testBowlingAverage": 28,
+    "concentration": 75,
+    "patience": 55,
+    "bowlingType": "pace"
+  },
+  {
+    "id": "eng_carse",
+    "name": "B. CARSE",
+    "role": "bowler",
+    "age": 29,
+    "batting": {
+      "timing": 52,
+      "power": 58,
+      "technique": 45,
+      "temperament": 50,
+      "style": "aggressive"
+    },
+    "bowling": {
+      "pace": 90,
+      "accuracy": 78,
+      "variation": 72,
+      "stamina": 82,
+      "style": "fast_medium"
+    },
+    "fielding": {
+      "catching": 70,
+      "throwing": 80,
+      "agility": 72
+    },
+    "mental": {
+      "concentration": 72,
+      "pressure": 75,
+      "adaptability": 73
+    },
+    "form": 75,
+    "fitness": 88,
+    "confidence": 75,
+    "testBattingAverage": 15,
+    "testBowlingAverage": 30,
+    "concentration": 72,
+    "patience": 52,
+    "bowlingType": "pace"
+  },
+  {
+    "id": "eng_potts",
+    "name": "M. POTTS",
+    "role": "bowler",
+    "age": 25,
+    "batting": {
+      "timing": 48,
+      "power": 50,
+      "technique": 42,
+      "temperament": 48,
+      "style": "defensive"
+    },
+    "bowling": {
+      "pace": 86,
+      "accuracy": 80,
+      "variation": 70,
+      "stamina": 78,
+      "style": "fast_medium"
+    },
+    "fielding": {
+      "catching": 68,
+      "throwing": 75,
+      "agility": 70
+    },
+    "mental": {
+      "concentration": 70,
+      "pressure": 72,
+      "adaptability": 71
+    },
+    "form": 72,
+    "fitness": 88,
+    "confidence": 72,
+    "testBattingAverage": 14,
+    "testBowlingAverage": 32,
+    "concentration": 70,
+    "patience": 50,
+    "bowlingType": "pace"
+  },
+  {
+    "id": "eng_wood",
+    "name": "M. WOOD",
+    "role": "bowler",
+    "age": 34,
+    "batting": {
+      "timing": 45,
+      "power": 52,
+      "technique": 40,
+      "temperament": 48,
+      "style": "aggressive"
+    },
+    "bowling": {
+      "pace": 95,
+      "accuracy": 75,
+      "variation": 70,
+      "stamina": 72,
+      "style": "fast"
+    },
+    "fielding": {
+      "catching": 65,
+      "throwing": 75,
+      "agility": 68
+    },
+    "mental": {
+      "concentration": 75,
+      "pressure": 78,
+      "adaptability": 76
+    },
+    "form": 75,
+    "fitness": 82,
+    "confidence": 75,
+    "testBattingAverage": 11,
+    "testBowlingAverage": 33,
+    "concentration": 75,
+    "patience": 48,
+    "bowlingType": "pace-fast"
+  },
+  {
+    "id": "eng_tongue",
+    "name": "J. TONGUE",
+    "role": "bowler",
+    "age": 26,
+    "batting": {
+      "timing": 40,
+      "power": 45,
+      "technique": 38,
+      "temperament": 42,
+      "style": "defensive"
+    },
+    "bowling": {
+      "pace": 84,
+      "accuracy": 78,
+      "variation": 68,
+      "stamina": 75,
+      "style": "fast_medium"
+    },
+    "fielding": {
+      "catching": 65,
+      "throwing": 70,
+      "agility": 68
+    },
+    "mental": {
+      "concentration": 68,
+      "pressure": 70,
+      "adaptability": 69
+    },
+    "form": 68,
+    "fitness": 85,
+    "confidence": 68,
+    "testBattingAverage": 10,
+    "testBowlingAverage": 35,
+    "concentration": 68,
+    "patience": 45,
+    "bowlingType": "pace"
+  },
+  {
+    "id": "eng_bashir",
+    "name": "S. BASHIR",
+    "role": "bowler",
+    "age": 21,
+    "batting": {
+      "timing": 35,
+      "power": 40,
+      "technique": 35,
+      "temperament": 38,
+      "style": "defensive"
+    },
+    "bowling": {
+      "pace": 45,
+      "accuracy": 90,
+      "variation": 85,
+      "stamina": 88,
+      "style": "off_spin"
+    },
+    "fielding": {
+      "catching": 70,
+      "throwing": 68,
+      "agility": 72
+    },
+    "mental": {
+      "concentration": 75,
+      "pressure": 72,
+      "adaptability": 74
+    },
+    "form": 75,
+    "fitness": 92,
+    "confidence": 72,
+    "testBattingAverage": 8,
+    "testBowlingAverage": 34,
+    "concentration": 75,
+    "patience": 45,
+    "bowlingType": "spin-off"
+  },
+  {
+    "id": "aus_khawaja",
+    "name": "U. KHAWAJA",
+    "role": "batsman",
+    "age": 37,
+    "batting": {
+      "timing": 88,
+      "power": 75,
+      "technique": 92,
+      "temperament": 94,
+      "style": "defensive"
+    },
+    "bowling": {
+      "pace": 20,
+      "accuracy": 15,
+      "variation": 10,
+      "stamina": 30,
+      "style": "medium"
+    },
+    "fielding": {
+      "catching": 80,
+      "throwing": 72,
+      "agility": 70
+    },
+    "mental": {
+      "concentration": 94,
+      "pressure": 90,
+      "adaptability": 88
+    },
+    "form": 85,
+    "fitness": 85,
+    "confidence": 85,
+    "testBattingAverage": 48,
+    "testBowlingAverage": 0,
+    "concentration": 94,
+    "patience": 92
+  },
+  {
+    "id": "aus_smith",
+    "name": "S. SMITH",
+    "role": "batsman",
+    "age": 35,
+    "batting": {
+      "timing": 95,
+      "power": 80,
+      "technique": 98,
+      "temperament": 96,
+      "style": "balanced"
+    },
+    "bowling": {
+      "pace": 30,
+      "accuracy": 50,
+      "variation": 45,
+      "stamina": 55,
+      "style": "leg_spin"
+    },
+    "fielding": {
+      "catching": 88,
+      "throwing": 82,
+      "agility": 78
+    },
+    "mental": {
+      "concentration": 96,
+      "pressure": 95,
+      "adaptability": 94
+    },
+    "form": 92,
+    "fitness": 88,
+    "confidence": 92,
+    "testBattingAverage": 56,
+    "testBowlingAverage": 55,
+    "concentration": 96,
+    "patience": 94,
+    "captain": true
+  },
+  {
+    "id": "aus_labuschagne",
+    "name": "M. LABUSCHAGNE",
+    "role": "batsman",
+    "age": 30,
+    "batting": {
+      "timing": 90,
+      "power": 76,
+      "technique": 94,
+      "temperament": 92,
+      "style": "balanced"
+    },
+    "bowling": {
+      "pace": 35,
+      "accuracy": 52,
+      "variation": 48,
+      "stamina": 58,
+      "style": "leg_spin"
+    },
+    "fielding": {
+      "catching": 85,
+      "throwing": 80,
+      "agility": 82
+    },
+    "mental": {
+      "concentration": 92,
+      "pressure": 90,
+      "adaptability": 88
+    },
+    "form": 88,
+    "fitness": 92,
+    "confidence": 88,
+    "testBattingAverage": 52,
+    "testBowlingAverage": 50,
+    "concentration": 92,
+    "patience": 90
+  },
+  {
+    "id": "aus_head",
+    "name": "T. HEAD",
+    "role": "batsman",
+    "age": 30,
+    "batting": {
+      "timing": 85,
+      "power": 88,
+      "technique": 78,
+      "temperament": 82,
+      "style": "aggressive"
+    },
+    "bowling": {
+      "pace": 28,
+      "accuracy": 48,
+      "variation": 42,
+      "stamina": 50,
+      "style": "left_arm_spin"
+    },
+    "fielding": {
+      "catching": 82,
+      "throwing": 78,
+      "agility": 80
+    },
+    "mental": {
+      "concentration": 80,
+      "pressure": 85,
+      "adaptability": 83
+    },
+    "form": 85,
+    "fitness": 90,
+    "confidence": 85,
+    "testBattingAverage": 44,
+    "testBowlingAverage": 48,
+    "concentration": 80,
+    "patience": 75
+  },
+  {
+    "id": "aus_weatherald",
+    "name": "J. WEATHERALD",
+    "role": "batsman",
+    "age": 30,
+    "batting": {
+      "timing": 76,
+      "power": 80,
+      "technique": 72,
+      "temperament": 70,
+      "style": "aggressive"
+    },
+    "bowling": {
+      "pace": 20,
+      "accuracy": 15,
+      "variation": 10,
+      "stamina": 30,
+      "style": "medium"
+    },
+    "fielding": {
+      "catching": 78,
+      "throwing": 75,
+      "agility": 76
+    },
+    "mental": {
+      "concentration": 72,
+      "pressure": 70,
+      "adaptability": 74
+    },
+    "form": 72,
+    "fitness": 88,
+    "confidence": 70,
+    "testBattingAverage": 35,
+    "testBowlingAverage": 0,
+    "concentration": 72,
+    "patience": 68
+  },
+  {
+    "id": "aus_green",
+    "name": "C. GREEN",
+    "role": "all_rounder",
+    "age": 25,
+    "batting": {
+      "timing": 80,
+      "power": 82,
+      "technique": 78,
+      "temperament": 76,
+      "style": "balanced"
+    },
+    "bowling": {
+      "pace": 88,
+      "accuracy": 75,
+      "variation": 70,
+      "stamina": 80,
+      "style": "fast_medium"
+    },
+    "fielding": {
+      "catching": 85,
+      "throwing": 88,
+      "agility": 85
+    },
+    "mental": {
+      "concentration": 78,
+      "pressure": 80,
+      "adaptability": 79
+    },
+    "form": 80,
+    "fitness": 92,
+    "confidence": 80,
+    "testBattingAverage": 38,
+    "testBowlingAverage": 35,
+    "concentration": 78,
+    "patience": 75
+  },
+  {
+    "id": "aus_webster",
+    "name": "B. WEBSTER",
+    "role": "all_rounder",
+    "age": 30,
+    "batting": {
+      "timing": 74,
+      "power": 76,
+      "technique": 72,
+      "temperament": 70,
+      "style": "balanced"
+    },
+    "bowling": {
+      "pace": 82,
+      "accuracy": 78,
+      "variation": 72,
+      "stamina": 75,
+      "style": "fast_medium"
+    },
+    "fielding": {
+      "catching": 76,
+      "throwing": 78,
+      "agility": 75
+    },
+    "mental": {
+      "concentration": 72,
+      "pressure": 74,
+      "adaptability": 73
+    },
+    "form": 72,
+    "fitness": 88,
+    "confidence": 72,
+    "testBattingAverage": 32,
+    "testBowlingAverage": 38,
+    "concentration": 72,
+    "patience": 70
+  },
+  {
+    "id": "aus_carey",
+    "name": "A. CAREY",
+    "role": "wicket_keeper",
+    "age": 32,
+    "batting": {
+      "timing": 78,
+      "power": 74,
+      "technique": 76,
+      "temperament": 78,
+      "style": "balanced"
+    },
+    "bowling": {
+      "pace": 20,
+      "accuracy": 15,
+      "variation": 10,
+      "stamina": 30,
+      "style": "medium"
+    },
+    "fielding": {
+      "catching": 90,
+      "throwing": 82,
+      "agility": 80
+    },
+    "mental": {
+      "concentration": 80,
+      "pressure": 82,
+      "adaptability": 79
+    },
+    "form": 78,
+    "fitness": 88,
+    "confidence": 78,
+    "testBattingAverage": 28,
+    "testBowlingAverage": 0,
+    "concentration": 80,
+    "patience": 76,
+    "isKeeper": true
+  },
+  {
+    "id": "aus_inglis",
+    "name": "J. INGLIS",
+    "role": "wicket_keeper",
+    "age": 29,
+    "batting": {
+      "timing": 76,
+      "power": 78,
+      "technique": 72,
+      "temperament": 74,
+      "style": "aggressive"
+    },
+    "bowling": {
+      "pace": 18,
+      "accuracy": 12,
+      "variation": 8,
+      "stamina": 25,
+      "style": "medium"
+    },
+    "fielding": {
+      "catching": 88,
+      "throwing": 78,
+      "agility": 82
+    },
+    "mental": {
+      "concentration": 74,
+      "pressure": 76,
+      "adaptability": 75
+    },
+    "form": 74,
+    "fitness": 90,
+    "confidence": 74,
+    "testBattingAverage": 25,
+    "testBowlingAverage": 0,
+    "concentration": 74,
+    "patience": 70,
+    "isKeeper": true
+  },
+  {
+    "id": "aus_starc",
+    "name": "M. STARC",
+    "role": "bowler",
+    "age": 34,
+    "batting": {
+      "timing": 58,
+      "power": 65,
+      "technique": 48,
+      "temperament": 55,
+      "style": "aggressive"
+    },
+    "bowling": {
+      "pace": 95,
+      "accuracy": 82,
+      "variation": 88,
+      "stamina": 80,
+      "style": "fast"
+    },
+    "fielding": {
+      "catching": 72,
+      "throwing": 80,
+      "agility": 75
+    },
+    "mental": {
+      "concentration": 82,
+      "pressure": 85,
+      "adaptability": 83
+    },
+    "form": 85,
+    "fitness": 85,
+    "confidence": 85,
+    "testBattingAverage": 14,
+    "testBowlingAverage": 28,
+    "concentration": 82,
+    "patience": 52,
+    "bowlingType": "pace-left"
+  },
+  {
+    "id": "aus_hazlewood",
+    "name": "J. HAZLEWOOD",
+    "role": "bowler",
+    "age": 33,
+    "batting": {
+      "timing": 45,
+      "power": 50,
+      "technique": 42,
+      "temperament": 48,
+      "style": "defensive"
+    },
+    "bowling": {
+      "pace": 88,
+      "accuracy": 92,
+      "variation": 78,
+      "stamina": 82,
+      "style": "fast_medium"
+    },
+    "fielding": {
+      "catching": 70,
+      "throwing": 75,
+      "agility": 68
+    },
+    "mental": {
+      "concentration": 88,
+      "pressure": 90,
+      "adaptability": 87
+    },
+    "form": 88,
+    "fitness": 85,
+    "confidence": 88,
+    "testBattingAverage": 11,
+    "testBowlingAverage": 26,
+    "concentration": 88,
+    "patience": 50,
+    "bowlingType": "pace"
+  },
+  {
+    "id": "aus_boland",
+    "name": "S. BOLAND",
+    "role": "bowler",
+    "age": 35,
+    "batting": {
+      "timing": 40,
+      "power": 45,
+      "technique": 38,
+      "temperament": 42,
+      "style": "defensive"
+    },
+    "bowling": {
+      "pace": 85,
+      "accuracy": 90,
+      "variation": 72,
+      "stamina": 78,
+      "style": "fast_medium"
+    },
+    "fielding": {
+      "catching": 68,
+      "throwing": 72,
+      "agility": 65
+    },
+    "mental": {
+      "concentration": 82,
+      "pressure": 85,
+      "adaptability": 80
+    },
+    "form": 82,
+    "fitness": 82,
+    "confidence": 82,
+    "testBattingAverage": 9,
+    "testBowlingAverage": 25,
+    "concentration": 82,
+    "patience": 45,
+    "bowlingType": "pace"
+  },
+  {
+    "id": "aus_abbott",
+    "name": "S. ABBOTT",
+    "role": "bowler",
+    "age": 31,
+    "batting": {
+      "timing": 48,
+      "power": 52,
+      "technique": 42,
+      "temperament": 46,
+      "style": "defensive"
+    },
+    "bowling": {
+      "pace": 86,
+      "accuracy": 85,
+      "variation": 75,
+      "stamina": 80,
+      "style": "fast_medium"
+    },
+    "fielding": {
+      "catching": 70,
+      "throwing": 75,
+      "agility": 72
+    },
+    "mental": {
+      "concentration": 76,
+      "pressure": 78,
+      "adaptability": 75
+    },
+    "form": 76,
+    "fitness": 88,
+    "confidence": 76,
+    "testBattingAverage": 12,
+    "testBowlingAverage": 30,
+    "concentration": 76,
+    "patience": 48,
+    "bowlingType": "pace"
+  },
+  {
+    "id": "aus_doggett",
+    "name": "B. DOGGETT",
+    "role": "bowler",
+    "age": 30,
+    "batting": {
+      "timing": 42,
+      "power": 48,
+      "technique": 38,
+      "temperament": 40,
+      "style": "defensive"
+    },
+    "bowling": {
+      "pace": 84,
+      "accuracy": 82,
+      "variation": 70,
+      "stamina": 76,
+      "style": "fast_medium"
+    },
+    "fielding": {
+      "catching": 66,
+      "throwing": 70,
+      "agility": 68
+    },
+    "mental": {
+      "concentration": 72,
+      "pressure": 74,
+      "adaptability": 71
+    },
+    "form": 72,
+    "fitness": 85,
+    "confidence": 72,
+    "testBattingAverage": 10,
+    "testBowlingAverage": 32,
+    "concentration": 72,
+    "patience": 44,
+    "bowlingType": "pace"
+  },
+  {
+    "id": "aus_lyon",
+    "name": "N. LYON",
+    "role": "bowler",
+    "age": 36,
+    "batting": {
+      "timing": 48,
+      "power": 45,
+      "technique": 42,
+      "temperament": 50,
+      "style": "defensive"
+    },
+    "bowling": {
+      "pace": 40,
+      "accuracy": 90,
+      "variation": 85,
+      "stamina": 92,
+      "style": "off_spin"
+    },
+    "fielding": {
+      "catching": 72,
+      "throwing": 68,
+      "agility": 65
+    },
+    "mental": {
+      "concentration": 92,
+      "pressure": 94,
+      "adaptability": 90
+    },
+    "form": 88,
+    "fitness": 85,
+    "confidence": 88,
+    "testBattingAverage": 13,
+    "testBowlingAverage": 31,
+    "concentration": 92,
+    "patience": 52,
+    "bowlingType": "spin-off"
+  }
+]
