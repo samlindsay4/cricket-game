@@ -120,18 +120,23 @@ const TestMatchLive = ({ onNavigate }) => {
     setIsSimulating(true)
     
     try {
-      let ballsInOver = 0
+      // Calculate balls remaining in current over
+      const ballsInCurrentOver = matchState.balls % 6
+      const ballsToSimulate = ballsInCurrentOver === 0 ? 6 : (6 - ballsInCurrentOver)
       
-      while (ballsInOver < 6 && !matchState.isInningsComplete() && !matchState.isSessionComplete()) {
+      let legalBalls = 0
+      
+      // Simulate remaining balls to complete the over
+      while (legalBalls < ballsToSimulate && !matchState.isInningsComplete() && !matchState.isSessionComplete()) {
         const result = simulateTestBall(matchState, probabilityEngine)
-        if (result.isLegalDelivery) ballsInOver++
+        if (result.isLegalDelivery) legalBalls++
         
         await new Promise(resolve => setTimeout(resolve, 50))
         setMatchState(Object.assign(Object.create(Object.getPrototypeOf(matchState)), matchState))
       }
       
       // Rotate strike at end of over
-      if (ballsInOver === 6 && !matchState.isInningsComplete()) {
+      if (legalBalls === ballsToSimulate && !matchState.isInningsComplete()) {
         matchState.rotateStrike()
         rotateBowler()
       }
