@@ -8,10 +8,9 @@ const TeletextButton = ({
   children, 
   onClick, 
   color = 'blue', 
-  textColor = 'white',
   disabled = false 
 }) => {
-  const className = `teletext-button teletext-button--${color} teletext-button-text--${textColor} ${disabled ? 'teletext-button--disabled' : ''}`
+  const className = `teletext-button teletext-button--${color} ${disabled ? 'teletext-button--disabled' : ''}`
   
   return (
     <button 

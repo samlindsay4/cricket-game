@@ -14,6 +14,11 @@
   --teletext-cyan: #00FFFF;
   --teletext-white: #FFFFFF;
   
+  /* Semi-transparent variants for overlays */
+  --teletext-black-semi: var(--teletext-black-semi);
+  --teletext-black-overlay: var(--teletext-black-overlay);
+  --teletext-blue-semi: var(--teletext-blue-semi);
+  
   /* Background and text defaults */
   --bg-color: var(--teletext-black);
   --text-color: var(--teletext-yellow);
@@ -357,7 +362,7 @@ body::before {
   padding: 0.5rem;
   border: 2px solid var(--text-color);
   text-align: center;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--teletext-black-semi);
 }
 
 .teletext-stat__label {
@@ -477,7 +482,7 @@ body::before {
   text-align: center;
   cursor: pointer;
   transition: all 0.2s;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--teletext-black-semi);
 }
 
 .teletext-menu-item:hover {
@@ -542,7 +547,7 @@ body::before {
 .teletext-scorecard {
   border: 3px solid var(--teletext-yellow);
   padding: 1rem;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: var(--teletext-black-overlay);
   margin: 1rem 0;
 }
 
@@ -637,7 +642,7 @@ body::before {
 }
 
 .teletext-scorecard-table__row:nth-child(odd) {
-  background-color: rgba(0, 0, 255, 0.2);
+  background-color: var(--teletext-blue-semi);
 }
 
 .col-name {
