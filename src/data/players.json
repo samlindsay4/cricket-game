@@ -1,0 +1,174 @@
+[
+  {
+    "id": "player_001",
+    "name": "Jack Anderson",
+    "role": "batsman",
+    "age": 28,
+    "batting": {
+      "timing": 75,
+      "power": 68,
+      "technique": 80,
+      "temperament": 72,
+      "style": "balanced"
+    },
+    "bowling": {
+      "pace": 45,
+      "accuracy": 40,
+      "variation": 35,
+      "stamina": 50,
+      "style": "medium"
+    },
+    "fielding": {
+      "catching": 70,
+      "throwing": 65,
+      "agility": 68
+    },
+    "mental": {
+      "concentration": 78,
+      "pressure": 75,
+      "adaptability": 70
+    },
+    "careerStats": {
+      "matches": 45,
+      "runs": 1850,
+      "wickets": 2,
+      "catches": 28,
+      "highScore": 124,
+      "average": 41.11,
+      "strikeRate": 128.5,
+      "economy": 8.5
+    },
+    "form": 65,
+    "fitness": 95,
+    "confidence": 70
+  },
+  {
+    "id": "player_002",
+    "name": "Mohammed Khan",
+    "role": "bowler",
+    "age": 25,
+    "batting": {
+      "timing": 45,
+      "power": 40,
+      "technique": 42,
+      "temperament": 48,
+      "style": "defensive"
+    },
+    "bowling": {
+      "pace": 82,
+      "accuracy": 78,
+      "variation": 75,
+      "stamina": 80,
+      "style": "fast"
+    },
+    "fielding": {
+      "catching": 60,
+      "throwing": 72,
+      "agility": 70
+    },
+    "mental": {
+      "concentration": 72,
+      "pressure": 80,
+      "adaptability": 68
+    },
+    "careerStats": {
+      "matches": 38,
+      "runs": 245,
+      "wickets": 52,
+      "catches": 15,
+      "highScore": 28,
+      "average": 8.75,
+      "strikeRate": 95.2,
+      "economy": 7.2
+    },
+    "form": 72,
+    "fitness": 92,
+    "confidence": 68
+  },
+  {
+    "id": "player_003",
+    "name": "David Thompson",
+    "role": "all_rounder",
+    "age": 30,
+    "batting": {
+      "timing": 65,
+      "power": 72,
+      "technique": 60,
+      "temperament": 70,
+      "style": "aggressive"
+    },
+    "bowling": {
+      "pace": 65,
+      "accuracy": 68,
+      "variation": 62,
+      "stamina": 70,
+      "style": "fast_medium"
+    },
+    "fielding": {
+      "catching": 75,
+      "throwing": 78,
+      "agility": 72
+    },
+    "mental": {
+      "concentration": 68,
+      "pressure": 72,
+      "adaptability": 75
+    },
+    "careerStats": {
+      "matches": 52,
+      "runs": 1420,
+      "wickets": 38,
+      "catches": 35,
+      "highScore": 89,
+      "average": 28.4,
+      "strikeRate": 142.8,
+      "economy": 8.1
+    },
+    "form": 58,
+    "fitness": 88,
+    "confidence": 62
+  },
+  {
+    "id": "player_004",
+    "name": "Raj Patel",
+    "role": "wicket_keeper",
+    "age": 27,
+    "batting": {
+      "timing": 68,
+      "power": 55,
+      "technique": 70,
+      "temperament": 75,
+      "style": "balanced"
+    },
+    "bowling": {
+      "pace": 35,
+      "accuracy": 40,
+      "variation": 30,
+      "stamina": 45,
+      "style": "medium"
+    },
+    "fielding": {
+      "catching": 88,
+      "throwing": 70,
+      "agility": 75
+    },
+    "mental": {
+      "concentration": 82,
+      "pressure": 78,
+      "adaptability": 72
+    },
+    "careerStats": {
+      "matches": 48,
+      "runs": 1280,
+      "wickets": 0,
+      "catches": 42,
+      "highScore": 76,
+      "average": 28.44,
+      "strikeRate": 118.5,
+      "economy": 0
+    },
+    "form": 68,
+    "fitness": 90,
+    "confidence": 65
+  }
+]
