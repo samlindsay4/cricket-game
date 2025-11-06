@@ -317,7 +317,8 @@ export class BowlingManager {
     if (bowlerStats && bowlerStats.balls >= 36) { // At least 6 overs
       // Check if bowler is taking wickets (2+ wickets)
       const wicketsInSpell = bowlerStats.wickets
-      if (wicketsInSpell >= 2 && currentSpell < MAX_PACE_SPELL - 2) {
+      const maxSpellForType = isPace ? MAX_PACE_SPELL : MAX_SPIN_SPELL
+      if (wicketsInSpell >= 2 && currentSpell < maxSpellForType - 2) {
         // Keep them on! They're taking wickets
         // But start thinking about rest when within 2 overs of max
         return false
@@ -325,7 +326,7 @@ export class BowlingManager {
       
       // Check if bowling economically (under 2.5 runs/over in Tests)
       const economy = bowlerStats.balls > 0 ? (bowlerStats.runs / bowlerStats.balls) * 6 : 0
-      if (economy < 2.5 && currentSpell < MAX_PACE_SPELL - 2) {
+      if (economy < 2.5 && currentSpell < maxSpellForType - 2) {
         // Keep them on! They're bowling economically
         return false
       }
