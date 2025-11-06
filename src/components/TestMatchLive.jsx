@@ -470,19 +470,68 @@ const TestMatchLive = ({ onNavigate }) => {
           <h2 className="teletext-subtitle">MATCH COMPLETE</h2>
         </div>
         
-        <div className="teletext-block teletext-block--yellow">
-          <p className="teletext-text teletext-text--black" style={{ fontSize: '1.2rem' }}>
-            {result.description}
-          </p>
+        {/* Match Result in teletext table format */}
+        <div className="teletext-block" style={{ marginTop: '1rem' }}>
+          <h3 className="teletext-subtitle" style={{ color: '#00FFFF', marginBottom: '0.5rem' }}>FINAL SCORES</h3>
+          
+          {/* Display all innings scores in table format */}
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: '2fr 1fr',
+            gap: '0.3rem',
+            fontSize: '0.9rem',
+            fontFamily: 'monospace'
+          }}>
+            {matchState.allInnings.first && (
+              <>
+                <div style={{ color: '#FFFFFF' }}>
+                  {team1Data.name} 1ST INNINGS
+                </div>
+                <div style={{ color: '#00FF00', textAlign: 'right' }}>
+                  {matchState.allInnings.first.runs}/{matchState.allInnings.first.wickets}
+                </div>
+              </>
+            )}
+            
+            {matchState.allInnings.second && (
+              <>
+                <div style={{ color: '#FFFFFF' }}>
+                  {team2Data.name} 1ST INNINGS
+                </div>
+                <div style={{ color: '#00FF00', textAlign: 'right' }}>
+                  {matchState.allInnings.second.runs}/{matchState.allInnings.second.wickets}
+                </div>
+              </>
+            )}
+            
+            {matchState.allInnings.third && (
+              <>
+                <div style={{ color: '#FFFFFF' }}>
+                  {team1Data.name} 2ND INNINGS
+                </div>
+                <div style={{ color: '#00FF00', textAlign: 'right' }}>
+                  {matchState.allInnings.third.runs}/{matchState.allInnings.third.wickets}
+                </div>
+              </>
+            )}
+            
+            {matchState.allInnings.fourth && (
+              <>
+                <div style={{ color: '#FFFFFF' }}>
+                  {team2Data.name} 2ND INNINGS
+                </div>
+                <div style={{ color: '#00FF00', textAlign: 'right' }}>
+                  {matchState.allInnings.fourth.runs}/{matchState.allInnings.fourth.wickets}
+                </div>
+              </>
+            )}
+          </div>
         </div>
         
-        <div className="teletext-block">
-          <h3 className="teletext-subtitle">FINAL SCORES</h3>
-          <p className="teletext-text">
-            {matchState.allInnings.first && `${team1Data.name}: ${matchState.allInnings.first.runs}/${matchState.allInnings.first.wickets} & ${matchState.allInnings.third?.runs || 0}/${matchState.allInnings.third?.wickets || 0}`}
-          </p>
-          <p className="teletext-text">
-            {matchState.allInnings.second && `${team2Data.name}: ${matchState.allInnings.second.runs}/${matchState.allInnings.second.wickets} & ${matchState.allInnings.fourth?.runs || 0}/${matchState.allInnings.fourth?.wickets || 0}`}
+        {/* Result text in colored block */}
+        <div className="teletext-block teletext-block--yellow" style={{ marginTop: '1rem' }}>
+          <p className="teletext-text teletext-text--black" style={{ fontSize: '1.2rem', textAlign: 'center' }}>
+            {result.description}
           </p>
         </div>
         
