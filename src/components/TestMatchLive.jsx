@@ -213,9 +213,17 @@ const TestMatchLive = ({ onNavigate }) => {
   
   // Handle session break
   const handleSessionBreak = () => {
-    // CRITICAL FIX: Reset bowling spells at session breaks
-    if (bowlingManager) {
-      bowlingManager.resetSpellsForSessionBreak()
+    // Check if this is end of day (session 3 complete)
+    if (matchState.session === 3) {
+      // End of day - reset spell tracking completely
+      if (bowlingManager) {
+        bowlingManager.resetSpellsForEndOfDay()
+      }
+    } else {
+      // Lunch or Tea - partial reset (allow bowlers to bowl again but track cumulative)
+      if (bowlingManager) {
+        bowlingManager.resetSpellsForSessionBreak()
+      }
     }
     
     // Get top batsmen and bowlers
@@ -254,49 +262,6 @@ const TestMatchLive = ({ onNavigate }) => {
   
   // Handle innings completion
   const handleInningsComplete = () => {
-    // CRITICAL FIX: Before switching innings, check for innings victory after 3rd innings
-    if (matchState.inningsNumber === 3) {
-      // After 3rd innings completes, check if an innings victory occurred
-      // Team batting first total = 1st innings + 3rd innings
-      // Team batting second total = 2nd innings (4th innings hasn't started)
-      
-      const firstInningsRuns = matchState.allInnings.first.runs
-      const secondInningsRuns = matchState.allInnings.second.runs
-      const thirdInningsRuns = matchState.score // Current score (3rd innings just completed)
-      
-      // Calculate totals
-      let team1Total, team2Total
-      
-      if (matchState.followOnEnforced) {
-        // Follow-on was enforced: Team batting 2nd batted twice (2nd and 3rd innings)
-        // Team1 batted 1st innings only
-        team1Total = firstInningsRuns
-        team2Total = secondInningsRuns + thirdInningsRuns
-      } else {
-        // Normal progression: Team1 batted 1st and 3rd innings
-        team1Total = firstInningsRuns + thirdInningsRuns
-        team2Total = secondInningsRuns
-      }
-      
-      // Check for innings victory
-      if (team1Total > team2Total) {
-        // Innings victory! Team1 wins without Team2 getting a chance to bat 4th innings
-        const margin = team1Total - team2Total
-        
-        // Set match as complete
-        setMatchPhase('complete')
-        
-        // Don't call switchInnings() - match is over
-        return
-      }
-    }
-    
-    // Check if match is complete (for other reasons)
-    if (matchState.isMatchComplete()) {
-      setMatchPhase('complete')
-      return
-    }
-    
     // Get top batsmen and bowlers for innings summary
     const topBatsmen = getTopBatsmen(matchState.batsmanStats, matchState.battingTeam.players, 5)
     const topBowlers = getTopBowlers(matchState.bowlerStats, matchState.bowlingTeam.players, 5)
@@ -320,9 +285,10 @@ const TestMatchLive = ({ onNavigate }) => {
       const inningsSummary = `END OF INNINGS: ${matchState.battingTeam.name} ${matchState.score}/${matchState.wickets}`
       matchState.commentary.push(inningsSummary)
       
+      // CRITICAL FIX: Call switchInnings() - this handles innings victory checks in testMatchSimulator.js switchInnings() method
       matchState.switchInnings()
       
-      // Check if match became complete after switch (innings victory sets inningsNumber to 5)
+      // AFTER switching, check if match became complete
       if (matchState.isMatchComplete()) {
         setShowInningsSummary(false)
         setMatchPhase('complete')
@@ -380,17 +346,8 @@ const TestMatchLive = ({ onNavigate }) => {
     const currentOver = Math.floor(matchState.balls / 6)
     const previousBowler = matchState.bowler
     
-    // Update spell tracking for current bowler
+    // CRITICAL FIX: Always update spell tracking (every over)
     bowlingManager.updateSpell(previousBowler, currentOver)
-    
-    // Check if bowler should be rested (end of spell)
-    const currentSpell = bowlingManager.currentSpells.get(previousBowler.id) || 0
-    const shouldRest = bowlingManager.shouldChangeBowler(previousBowler, currentSpell, matchState)
-    
-    if (shouldRest) {
-      // Rest current bowler (marks them as needing extended rest)
-      bowlingManager.restBowler(previousBowler, currentOver)
-    }
     
     // ALWAYS select next bowler (can't bowl consecutive overs)
     // Pass previousBowler to ensure they are excluded from selection
