@@ -9,6 +9,7 @@ import { TestProbabilityEngine } from '../engine/testProbabilityEngine.js'
 import { MatchConditions } from '../engine/matchConditions.js'
 import { getEnglandSquad, getAustraliaSquad, selectTestXI, getBowlers, performToss } from '../utils/ashesHelpers.js'
 import { ballsToOvers } from '../engine/matchUtils.js'
+import { getTopBatsmen, getTopBowlers } from '../utils/matchHelpers.js'
 
 /**
  * TestMatchLive Component
@@ -199,6 +200,10 @@ const TestMatchLive = ({ onNavigate }) => {
   
   // Handle session break
   const handleSessionBreak = () => {
+    // Get top batsmen and bowlers
+    const topBatsmen = getTopBatsmen(matchState.batsmanStats, matchState.battingTeam.players, 3)
+    const topBowlers = getTopBowlers(matchState.bowlerStats, matchState.bowlingTeam.players, 3)
+    
     const summary = {
       day: matchState.day,
       session: matchState.session,
@@ -208,7 +213,8 @@ const TestMatchLive = ({ onNavigate }) => {
       totalRuns: matchState.score,
       totalWickets: matchState.wickets,
       overs: ballsToOvers(matchState.balls),
-      wicketsFallen: matchState.fallOfWickets.slice(-3) // Last 3 wickets
+      topBatsmen,
+      topBowlers
     }
     
     setSessionSummaryData(summary)

@@ -14,7 +14,8 @@ const SessionSummary = ({
   totalRuns,
   totalWickets,
   overs,
-  wicketsFallen,
+  topBatsmen,
+  topBowlers,
   onContinue
 }) => {
   const getSessionLabel = (sess) => {
@@ -47,34 +48,35 @@ const SessionSummary = ({
     <div className="teletext-block">
       <div className="teletext-block teletext-block--yellow" style={{ marginBottom: '1rem' }}>
         <h2 className="teletext-subtitle" style={{ color: '#000000' }}>
-          {getSessionLabel(session)} SUMMARY
+          {getSessionLabel(session)} SUMMARY - DAY {day}
         </h2>
-        <div style={{ color: '#000000', fontSize: '1.1rem', marginTop: '0.3rem' }}>
-          DAY {day}
-        </div>
       </div>
 
       <div className="teletext-block teletext-block--blue" style={{ marginBottom: '1rem' }}>
         <div style={{ fontSize: '1.2rem', color: '#FFFF00', textAlign: 'center' }}>
           {teamName}: {totalRuns}/{totalWickets} ({overs} OVERS)
         </div>
-        <div style={{ color: '#00FF00', textAlign: 'center', marginTop: '0.5rem' }}>
-          SESSION: {sessionRuns} RUNS, {sessionWickets} WICKETS
-        </div>
-        {sessionWickets > 0 && (
-          <div style={{ color: '#FFFFFF', textAlign: 'center', marginTop: '0.3rem', fontSize: '0.9rem' }}>
-            RUN RATE: {(sessionRuns / (overs.split('.')[0] || 1)).toFixed(2)}
-          </div>
-        )}
       </div>
 
-      {/* Wickets fallen in this session */}
-      {wicketsFallen && wicketsFallen.length > 0 && (
+      {/* Top Batsmen */}
+      {topBatsmen && topBatsmen.length > 0 && (
         <div className="teletext-block" style={{ marginBottom: '1rem' }}>
-          <h3 className="teletext-subtitle" style={{ color: '#FF0000' }}>WICKETS FALLEN:</h3>
-          {wicketsFallen.map((wicket, idx) => (
-            <div key={idx} style={{ fontSize: '0.9rem', marginTop: '0.3rem', color: '#FFFFFF' }}>
-              {wicket.batsman} {wicket.runs} {wicket.dismissal}
+          <h3 className="teletext-subtitle" style={{ color: '#00FF00' }}>TOP BATSMEN:</h3>
+          {topBatsmen.map((batsman, idx) => (
+            <div key={idx} style={{ fontSize: '0.9rem', marginTop: '0.3rem', color: '#FFFFFF', fontFamily: 'monospace' }}>
+              {idx + 1}. {batsman.name.padEnd(20)} {batsman.runs}{batsman.isOut ? '' : '*'} ({batsman.balls})
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Top Bowlers */}
+      {topBowlers && topBowlers.length > 0 && (
+        <div className="teletext-block" style={{ marginBottom: '1rem' }}>
+          <h3 className="teletext-subtitle" style={{ color: '#FF00FF' }}>TOP BOWLERS:</h3>
+          {topBowlers.map((bowler, idx) => (
+            <div key={idx} style={{ fontSize: '0.9rem', marginTop: '0.3rem', color: '#FFFFFF', fontFamily: 'monospace' }}>
+              {idx + 1}. {bowler.name.padEnd(20)} {bowler.wickets}/{bowler.runs} ({bowler.overs} ov)
             </div>
           ))}
         </div>
@@ -98,7 +100,7 @@ const SessionSummary = ({
 
       <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
         <TeletextButton color="green" onClick={onContinue}>
-          {session === 3 ? '[CONTINUE TO DAY ' + (day + 1) + ']' : '[CONTINUE TO ' + getBreakLabel(session) + ']'}
+          {session === 3 ? '[CONTINUE TO DAY ' + (day + 1) + ']' : '[CONTINUE]'}
         </TeletextButton>
       </div>
     </div>
