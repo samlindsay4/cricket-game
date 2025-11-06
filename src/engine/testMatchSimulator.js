@@ -19,6 +19,10 @@ import { formatScore, ballsToOvers, checkMilestone } from './matchUtils.js';
 import { BALL_OUTCOMES, WICKET_TYPES } from './matchConstants.js';
 import { Player, PLAYER_ROLES } from './playerStats.js';
 
+// Test cricket constants
+const FOLLOW_ON_THRESHOLD = 200; // Runs behind to enforce follow-on
+const FOLLOW_ON_ENFORCE_MARGIN = 250; // Enforce follow-on if trail is this large
+
 /**
  * Test Match State - extends MatchState for Test cricket
  */
@@ -233,7 +237,7 @@ export class TestMatchState extends MatchState {
     } else if (this.inningsNumber === 3) {
       // After 2nd innings: Check for follow-on
       const trail = this.allInnings.first.runs - this.allInnings.second.runs;
-      const followOnPossible = trail >= 200;
+      const followOnPossible = trail >= FOLLOW_ON_THRESHOLD;
       
       if (followOnPossible && this.shouldEnforceFollowOn(trail)) {
         // Follow-on enforced: Team batting 2nd bats again (DON'T swap)
@@ -273,9 +277,9 @@ export class TestMatchState extends MatchState {
    * @returns {boolean} True if follow-on should be enforced
    */
   shouldEnforceFollowOn(trail) {
-    // Simple logic: enforce if trail is very large (250+)
+    // Simple logic: enforce if trail is very large
     // This gives the batting team a chance to tire out opposition
-    return trail >= 250;
+    return trail >= FOLLOW_ON_ENFORCE_MARGIN;
   }
 
   /**

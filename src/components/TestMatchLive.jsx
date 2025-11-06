@@ -295,7 +295,10 @@ const TestMatchLive = ({ onNavigate }) => {
           matchState.commentary.push(`${matchState.battingTeam.name} bat again`);
         }
       } else if (matchState.inningsNumber === 4) {
-        const target = matchState.allInnings.first.runs + matchState.allInnings.third.runs + 1 - matchState.allInnings.second.runs;
+        // Target = (Team1's 1st + Team1's 2nd) - (Team2's 1st) + 1
+        const team1Total = matchState.allInnings.first.runs + matchState.allInnings.third.runs;
+        const team2Total = matchState.allInnings.second.runs;
+        const target = team1Total - team2Total + 1;
         matchState.commentary.push(`FINAL INNINGS`);
         matchState.commentary.push(`${matchState.battingTeam.name} need ${target} runs to win`);
       }
