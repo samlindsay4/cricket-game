@@ -4,6 +4,7 @@ import TestMatchScorecard from './TestMatchScorecard'
 import SessionSummary from './SessionSummary'
 import InningsSummary from './InningsSummary'
 import CommentaryFeed from './CommentaryFeed'
+import MatchScorecards from './MatchScorecards'
 import TeletextButton from './TeletextButton'
 import { TestMatchState, simulateTestBall } from '../engine/testMatchSimulator.js'
 import { TestProbabilityEngine } from '../engine/testProbabilityEngine.js'
@@ -31,6 +32,7 @@ const TestMatchLive = ({ onNavigate }) => {
   const [sessionSummaryData, setSessionSummaryData] = useState(null)
   const [showInningsSummary, setShowInningsSummary] = useState(false)
   const [inningsSummaryData, setInningsSummaryData] = useState(null)
+  const [showScorecards, setShowScorecards] = useState(false)
   
   // Initialize match on component mount
   useEffect(() => {
@@ -514,6 +516,20 @@ const TestMatchLive = ({ onNavigate }) => {
     )
   }
   
+  // Full scorecards screen
+  if (showScorecards && matchPhase === 'complete') {
+    return (
+      <TeletextPage pageNumber="P300" title="THE ASHES 2025 - SCORECARDS">
+        <MatchScorecards
+          matchState={matchState}
+          team1Data={team1Data}
+          team2Data={team2Data}
+          onBack={() => setShowScorecards(false)}
+        />
+      </TeletextPage>
+    )
+  }
+  
   // Match complete screen
   if (matchPhase === 'complete') {
     const result = matchState.determineMatchResult()
@@ -591,6 +607,9 @@ const TestMatchLive = ({ onNavigate }) => {
         </div>
         
         <div style={{ marginTop: '1rem' }}>
+          <TeletextButton color="cyan" onClick={() => setShowScorecards(true)}>
+            📊 VIEW FULL SCORECARDS
+          </TeletextButton>
           <TeletextButton color="green" onClick={handleRestartMatch}>
             NEW MATCH
           </TeletextButton>

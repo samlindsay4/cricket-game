@@ -194,6 +194,40 @@ export class TestMatchState extends MatchState {
    * Switch to next innings
    */
   switchInnings() {
+    // CRITICAL FIX: Build complete batting and bowling cards for scorecards
+    
+    // Build batting card - all batsmen with their stats
+    const battingCard = []
+    for (const player of this.battingTeam.players) {
+      const stats = this.batsmanStats.get(player.id)
+      if (stats) {
+        battingCard.push({
+          name: player.name,
+          runs: stats.runs,
+          balls: stats.balls,
+          fours: stats.fours || 0,
+          sixes: stats.sixes || 0,
+          howOut: stats.howOut || (stats.isOut ? 'out' : null),
+          notOut: !stats.isOut
+        })
+      }
+    }
+    
+    // Build bowling card - all bowlers who bowled
+    const bowlingCard = []
+    for (const player of this.bowlingTeam.players) {
+      const stats = this.bowlerStats.get(player.id)
+      if (stats && stats.balls > 0) {
+        bowlingCard.push({
+          name: player.name,
+          overs: ballsToOvers(stats.balls),
+          maidens: stats.maidens || 0,
+          runs: stats.runs,
+          wickets: stats.wickets
+        })
+      }
+    }
+    
     // Save current innings data
     const inningsData = {
       runs: this.score,
@@ -202,7 +236,9 @@ export class TestMatchState extends MatchState {
       extras: this.extras.wides + this.extras.noBalls + this.extras.byes + this.extras.legByes,
       fallOfWickets: [...this.fallOfWickets],
       commentary: [...this.commentary],
-      declared: this.declared
+      declared: this.declared,
+      battingCard: battingCard,
+      bowlingCard: bowlingCard
     };
     
     // Store innings data
@@ -504,7 +540,8 @@ export function simulateTestBall(matchState, probabilityEngine) {
   // Update match state based on outcome
   if (outcome.isWicket) {
     matchState.wickets++
-    matchState.handleWicket(matchState.striker, matchState.score)
+    // CRITICAL FIX: Pass wicket type and bowler info for detailed dismissals
+    matchState.handleWicket(matchState.striker, matchState.score, outcome.wicketType, matchState.bowler)
     
     // Update player confidence after getting out
     matchState.striker.confidence = Math.max(20, matchState.striker.confidence - 10)

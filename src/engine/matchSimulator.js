@@ -112,7 +112,7 @@ export class MatchState {
   /**
    * Handle wicket - bring in new batsman
    */
-  handleWicket(batsmanOut, runs) {
+  handleWicket(batsmanOut, runs, wicketType = null, bowler = null, fielder = null) {
     // Record fall of wicket
     this.fallOfWickets.push({
       batsman: batsmanOut.name,
@@ -121,10 +121,38 @@ export class MatchState {
       over: this.getCurrentOver()
     })
     
-    // Mark batsman as out
+    // Mark batsman as out and record dismissal
     const stats = this.batsmanStats.get(batsmanOut.id)
     if (stats) {
       stats.isOut = true
+      
+      // Format dismissal text
+      if (wicketType && bowler) {
+        switch (wicketType) {
+          case 'bowled':
+            stats.howOut = `b ${bowler.name}`
+            break
+          case 'caught':
+            stats.howOut = fielder ? `c ${fielder} b ${bowler.name}` : `c & b ${bowler.name}`
+            break
+          case 'lbw':
+            stats.howOut = `lbw b ${bowler.name}`
+            break
+          case 'stumped':
+            stats.howOut = fielder ? `st ${fielder} b ${bowler.name}` : `stumped`
+            break
+          case 'runOut':
+            stats.howOut = fielder ? `run out (${fielder})` : 'run out'
+            break
+          case 'hitWicket':
+            stats.howOut = `hit wicket b ${bowler.name}`
+            break
+          default:
+            stats.howOut = bowler ? `b ${bowler.name}` : 'out'
+        }
+      } else {
+        stats.howOut = 'out'
+      }
     }
     
     // Save partnership
