@@ -23,9 +23,14 @@ const CommentaryFeed = ({ commentary = [], maxItems = 10 }) => {
   const getCommentaryClass = (text) => {
     const lowerText = text.toLowerCase()
     
-    // CRITICAL FIX: Wickets should be RED background
-    if (lowerText.includes('wicket') || lowerText.includes('out') || lowerText.includes('bowled') || 
-        lowerText.includes('caught') || lowerText.includes('lbw') || lowerText.includes(' w ')) {
+    // CRITICAL FIX: RED background = WICKETS ONLY
+    // Check for actual wicket dismissals (not just the word "wicket")
+    if (lowerText.includes('out!') || lowerText.includes('bowled') || 
+        lowerText.includes('caught') || lowerText.includes('lbw') || 
+        lowerText.includes('stumped') || lowerText.includes('run out') ||
+        lowerText.includes('hit wicket') || lowerText.includes('timber') ||
+        lowerText.includes(' w ') || lowerText.includes('cleaned up') ||
+        lowerText.includes('knocked him over') || lowerText.includes('dismissed')) {
       return 'commentary-item--wicket'
     }
     
@@ -36,7 +41,7 @@ const CommentaryFeed = ({ commentary = [], maxItems = 10 }) => {
     }
     
     // Milestones (50s, 100s)
-    if (lowerText.includes('50') || lowerText.includes('100') || lowerText.includes('century') || 
+    if (lowerText.includes('fifty') || lowerText.includes('century') || 
         lowerText.includes('half-century') || lowerText.includes('maiden')) {
       return 'commentary-item--milestone'
     }
@@ -54,6 +59,7 @@ const CommentaryFeed = ({ commentary = [], maxItems = 10 }) => {
       return 'commentary-item--chance'
     }
     
+    // Leaves, dots, defenses = default grey (normal)
     return 'commentary-item--normal'
   }
   

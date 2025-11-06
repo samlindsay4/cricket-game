@@ -4,6 +4,7 @@ import TestMatchScorecard from './TestMatchScorecard'
 import SessionSummary from './SessionSummary'
 import InningsSummary from './InningsSummary'
 import CommentaryFeed from './CommentaryFeed'
+import MatchScorecards from './MatchScorecards'
 import TeletextButton from './TeletextButton'
 import { TestMatchState, simulateTestBall } from '../engine/testMatchSimulator.js'
 import { TestProbabilityEngine } from '../engine/testProbabilityEngine.js'
@@ -31,6 +32,7 @@ const TestMatchLive = ({ onNavigate }) => {
   const [sessionSummaryData, setSessionSummaryData] = useState(null)
   const [showInningsSummary, setShowInningsSummary] = useState(false)
   const [inningsSummaryData, setInningsSummaryData] = useState(null)
+  const [showScorecards, setShowScorecards] = useState(false)
   
   // Initialize match on component mount
   useEffect(() => {
@@ -211,6 +213,11 @@ const TestMatchLive = ({ onNavigate }) => {
   
   // Handle session break
   const handleSessionBreak = () => {
+    // CRITICAL FIX: Reset bowling spells at session breaks
+    if (bowlingManager) {
+      bowlingManager.resetSpellsForSessionBreak()
+    }
+    
     // Get top batsmen and bowlers
     const topBatsmen = getTopBatsmen(matchState.batsmanStats, matchState.battingTeam.players, 3)
     const topBowlers = getTopBowlers(matchState.bowlerStats, matchState.bowlingTeam.players, 3)
@@ -247,7 +254,44 @@ const TestMatchLive = ({ onNavigate }) => {
   
   // Handle innings completion
   const handleInningsComplete = () => {
-    // Check if match is complete
+    // CRITICAL FIX: Before switching innings, check for innings victory after 3rd innings
+    if (matchState.inningsNumber === 3) {
+      // After 3rd innings completes, check if an innings victory occurred
+      // Team batting first total = 1st innings + 3rd innings
+      // Team batting second total = 2nd innings (4th innings hasn't started)
+      
+      const firstInningsRuns = matchState.allInnings.first.runs
+      const secondInningsRuns = matchState.allInnings.second.runs
+      const thirdInningsRuns = matchState.score // Current score (3rd innings just completed)
+      
+      // Calculate totals
+      let team1Total, team2Total
+      
+      if (matchState.followOnEnforced) {
+        // Follow-on was enforced: Team batting 2nd batted twice (2nd and 3rd innings)
+        // Team1 batted 1st innings only
+        team1Total = firstInningsRuns
+        team2Total = secondInningsRuns + thirdInningsRuns
+      } else {
+        // Normal progression: Team1 batted 1st and 3rd innings
+        team1Total = firstInningsRuns + thirdInningsRuns
+        team2Total = secondInningsRuns
+      }
+      
+      // Check for innings victory
+      if (team1Total > team2Total) {
+        // Innings victory! Team1 wins without Team2 getting a chance to bat 4th innings
+        const margin = team1Total - team2Total
+        
+        // Set match as complete
+        setMatchPhase('complete')
+        
+        // Don't call switchInnings() - match is over
+        return
+      }
+    }
+    
+    // Check if match is complete (for other reasons)
     if (matchState.isMatchComplete()) {
       setMatchPhase('complete')
       return
@@ -277,6 +321,13 @@ const TestMatchLive = ({ onNavigate }) => {
       matchState.commentary.push(inningsSummary)
       
       matchState.switchInnings()
+      
+      // Check if match became complete after switch (innings victory sets inningsNumber to 5)
+      if (matchState.isMatchComplete()) {
+        setShowInningsSummary(false)
+        setMatchPhase('complete')
+        return
+      }
       
       // Clear "waiting for match to begin" message if present
       matchState.commentary = matchState.commentary.filter(c => 
@@ -465,6 +516,20 @@ const TestMatchLive = ({ onNavigate }) => {
     )
   }
   
+  // Full scorecards screen
+  if (showScorecards && matchPhase === 'complete') {
+    return (
+      <TeletextPage pageNumber="P300" title="THE ASHES 2025 - SCORECARDS">
+        <MatchScorecards
+          matchState={matchState}
+          team1Data={team1Data}
+          team2Data={team2Data}
+          onBack={() => setShowScorecards(false)}
+        />
+      </TeletextPage>
+    )
+  }
+  
   // Match complete screen
   if (matchPhase === 'complete') {
     const result = matchState.determineMatchResult()
@@ -542,6 +607,9 @@ const TestMatchLive = ({ onNavigate }) => {
         </div>
         
         <div style={{ marginTop: '1rem' }}>
+          <TeletextButton color="cyan" onClick={() => setShowScorecards(true)}>
+            📊 VIEW FULL SCORECARDS
+          </TeletextButton>
           <TeletextButton color="green" onClick={handleRestartMatch}>
             NEW MATCH
           </TeletextButton>
