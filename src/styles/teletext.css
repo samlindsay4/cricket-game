@@ -15,9 +15,9 @@
   --teletext-white: #FFFFFF;
   
   /* Semi-transparent variants for overlays */
-  --teletext-black-semi: var(--teletext-black-semi);
-  --teletext-black-overlay: var(--teletext-black-overlay);
-  --teletext-blue-semi: var(--teletext-blue-semi);
+  --teletext-black-semi: rgba(0, 0, 0, 0.7);
+  --teletext-black-overlay: rgba(0, 0, 0, 0.9);
+  --teletext-blue-semi: rgba(0, 0, 255, 0.7);
   
   /* Background and text defaults */
   --bg-color: var(--teletext-black);

@@ -22,6 +22,7 @@ import { Player, PLAYER_ROLES } from './playerStats.js';
 // Test cricket constants
 const FOLLOW_ON_THRESHOLD = 200; // Runs behind to enforce follow-on
 const FOLLOW_ON_ENFORCE_MARGIN = 250; // Enforce follow-on if trail is this large
+const MATCH_COMPLETE_INNINGS = 5; // Innings number indicating match is complete
 
 /**
  * Test Match State - extends MatchState for Test cricket
@@ -237,8 +238,8 @@ export class TestMatchState extends MatchState {
           margin: `innings and ${team1Total - team2Total} runs`,
           description: `${this.team1.name} WON BY INNINGS AND ${team1Total - team2Total} RUNS`
         };
-        // Set innings number to 5 to indicate match is complete
-        this.inningsNumber = 5;
+        // Set innings number to indicate match is complete
+        this.inningsNumber = MATCH_COMPLETE_INNINGS;
         return;
       }
     }
