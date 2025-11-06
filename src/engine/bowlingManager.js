@@ -22,6 +22,11 @@ export class BowlingManager {
     this.restingSince = new Map()  // Track when bowler was rested (over number)
     this.totalOversBowled = new Map() // Total overs per day
     
+    // TWO-END BOWLING SYSTEM: Track which bowler operates from each end
+    this.endA = null  // Bowler operating from end A
+    this.endB = null  // Bowler operating from end B
+    this.currentEnd = 'A'  // Current bowling end
+    
     this.categorizeBowlers()
   }
   
@@ -64,24 +69,95 @@ export class BowlingManager {
   
   /**
    * Select the next bowler based on current match situation
+   * Implements TWO-END bowling system
    * @param {number} currentOver - Current over number
    * @param {Object} matchState - Current match state
    * @param {Object} previousBowler - Previous bowler (MUST be excluded - can't bowl consecutive overs)
    * @returns {Object} Next bowler to bowl
    */
   selectNextBowler(currentOver, matchState, previousBowler = null) {
-    // Opening spell (overs 1-10): Opening bowlers alternate ends
+    // Initialize ends if first over
+    if (currentOver === 0 || (!this.endA && !this.endB)) {
+      if (this.openingBowlers.length >= 2) {
+        this.endA = this.openingBowlers[0]
+        this.endB = this.openingBowlers[1]
+        this.currentEnd = 'A'
+        return this.endA
+      } else if (this.openingBowlers.length === 1) {
+        this.endA = this.openingBowlers[0]
+        this.endB = this.allBowlers.find(b => b.id !== this.endA.id)
+        this.currentEnd = 'A'
+        return this.endA
+      } else {
+        this.endA = this.allBowlers[0]
+        this.endB = this.allBowlers[1] || this.allBowlers[0]
+        this.currentEnd = 'A'
+        return this.endA
+      }
+    }
+    
+    // TWO-END SYSTEM: Alternate between ends
+    // The bowler from the OTHER end bowls next (they can't bowl consecutive overs)
+    this.currentEnd = this.currentEnd === 'A' ? 'B' : 'A'
+    const bowlerFromThisEnd = this.currentEnd === 'A' ? this.endA : this.endB
+    
+    // Check if the bowler from this end should be changed
+    const spell = this.currentSpells.get(bowlerFromThisEnd.id) || 0
+    const shouldChange = this.shouldChangeBowler(bowlerFromThisEnd, spell, matchState)
+    
+    if (shouldChange) {
+      // Need to change the bowler at THIS end only
+      // Select a new bowler (excluding bowler from the OTHER end who just bowled)
+      const otherEndBowler = this.currentEnd === 'A' ? this.endB : this.endA
+      const newBowler = this.selectReplacementBowler(currentOver, matchState, otherEndBowler)
+      
+      // Rest the old bowler and assign new bowler to this end
+      this.restBowler(bowlerFromThisEnd, currentOver)
+      
+      if (this.currentEnd === 'A') {
+        this.endA = newBowler
+      } else {
+        this.endB = newBowler
+      }
+      
+      return newBowler
+    }
+    
+    return bowlerFromThisEnd
+  }
+  
+  /**
+   * Select a replacement bowler (when changing bowler at one end)
+   */
+  selectReplacementBowler(currentOver, matchState, excludeBowler) {
+    // Opening spell (overs 1-10): Use opening bowlers
     if (currentOver < 10) {
-      return this.selectOpeningBowler(currentOver, previousBowler)
+      const available = this.openingBowlers.filter(b => b.id !== excludeBowler.id && this.canBowlAgain(b, currentOver))
+      if (available.length > 0) return available[0]
     }
     
     // First change period (overs 10-25)
     if (currentOver < 25) {
-      return this.selectFirstChangeBowler(currentOver, previousBowler)
+      const available = this.firstChange.filter(b => b.id !== excludeBowler.id && this.canBowlAgain(b, currentOver))
+      if (available.length > 0) {
+        // Select bowler who has bowled least
+        available.sort((a, b) => this.currentSpells.get(a.id) - this.currentSpells.get(b.id))
+        return available[0]
+      }
+      
+      // Fall back to rested opening bowlers
+      const available2 = this.openingBowlers.filter(b => b.id !== excludeBowler.id && this.canBowlAgain(b, currentOver))
+      if (available2.length > 0) return available2[0]
     }
     
-    // Middle overs (25+): Rotate based on situation
-    return this.selectMiddleOversBowler(currentOver, matchState, previousBowler)
+    // Middle overs (25+): Consider spinners
+    if (currentOver >= 20 && this.spinners.length > 0) {
+      const available = this.spinners.filter(b => b.id !== excludeBowler.id && this.canBowlAgain(b, currentOver))
+      if (available.length > 0) return available[0]
+    }
+    
+    // Fall back to any available bowler
+    return this.findAnyAvailableBowler(currentOver, excludeBowler)
   }
   
   /**
@@ -217,12 +293,37 @@ export class BowlingManager {
     const isPace = !style.includes('spin')
     const isSpin = style.includes('spin')
     
-    // Check spell length
-    if (isPace && currentSpell >= 8) {
-      return true // Pace bowlers need rest after 8 overs
+    // Get bowler stats
+    const bowlerStats = matchState.getBowlerStats(bowler)
+    
+    // CRITICAL FIX: Don't remove successful bowlers
+    if (bowlerStats && bowlerStats.balls >= 36) { // At least 6 overs
+      // Check if bowler is taking wickets (2+ in current spell)
+      const wicketsInSpell = bowlerStats.wickets
+      if (wicketsInSpell >= 2) {
+        // Keep them on! They're taking wickets
+        // Only rest if they've bowled a very long spell
+        if (isPace && currentSpell >= 12) return true  // 12 over spell for wicket-taking pacer
+        if (isSpin && currentSpell >= 20) return true  // 20 over spell for wicket-taking spinner
+        return false
+      }
+      
+      // Check if bowling economically (under 2.5 runs/over in Tests)
+      const economy = bowlerStats.balls > 0 ? (bowlerStats.runs / bowlerStats.balls) * 6 : 0
+      if (economy < 2.5) {
+        // Keep them on! They're bowling economically
+        if (isPace && currentSpell >= 10) return true  // 10 over spell for economical pacer
+        if (isSpin && currentSpell >= 18) return true  // 18 over spell for economical spinner
+        return false
+      }
     }
     
-    if (isSpin && currentSpell >= 15) {
+    // Check spell length (standard rotation)
+    if (isPace && currentSpell >= 7) {
+      return true // Pace bowlers need rest after 7 overs (if not successful)
+    }
+    
+    if (isSpin && currentSpell >= 12) {
       return true // Spinners can bowl longer spells
     }
     
@@ -232,7 +333,6 @@ export class BowlingManager {
     }
     
     // Check if bowler is very expensive (economy > 5 in Tests)
-    const bowlerStats = matchState.getBowlerStats(bowler)
     if (bowlerStats && bowlerStats.balls >= 36) { // At least 6 overs
       const economy = bowlerStats.balls > 0 ? (bowlerStats.runs / bowlerStats.balls) * 6 : 0
       if (economy > 5.5) {
@@ -310,6 +410,11 @@ export class BowlingManager {
     this.currentSpells.clear()
     this.restingSince.clear()
     this.totalOversBowled.clear()
+    
+    // Reset two-end system
+    this.endA = null
+    this.endB = null
+    this.currentEnd = 'A'
     
     for (const bowler of this.allBowlers) {
       this.currentSpells.set(bowler.id, 0)

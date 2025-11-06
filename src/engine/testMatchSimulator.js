@@ -220,6 +220,29 @@ export class TestMatchState extends MatchState {
         break;
     }
     
+    // CRITICAL FIX: Check for innings victory after 3rd innings
+    if (this.inningsNumber === 3) {
+      // After 3rd innings, check if Team1 has already won
+      // Team1 total = 1st innings + 3rd innings
+      // Team2 total = 2nd innings (4th innings not started yet)
+      const team1Total = this.allInnings.first.runs + this.allInnings.third.runs;
+      const team2Total = this.allInnings.second.runs;
+      
+      if (team1Total > team2Total) {
+        // Team1 has already won by innings (Team2 can't catch up even with 4th innings)
+        // Don't increment innings number - match is complete
+        this.matchResult = {
+          result: 'win',
+          winner: this.team1,
+          margin: `innings and ${team1Total - team2Total} runs`,
+          description: `${this.team1.name} WON BY INNINGS AND ${team1Total - team2Total} RUNS`
+        };
+        // Set innings number to 5 to indicate match is complete
+        this.inningsNumber = 5;
+        return;
+      }
+    }
+    
     this.inningsNumber++;
     
     // CRITICAL FIX: Correct Test cricket innings order
@@ -373,6 +396,11 @@ export class TestMatchState extends MatchState {
    * Determine match result
    */
   determineMatchResult() {
+    // Check if match result was already set (e.g., innings victory)
+    if (this.matchResult) {
+      return this.matchResult;
+    }
+    
     // Not complete yet
     if (!this.isMatchComplete()) return null;
     
@@ -396,7 +424,32 @@ export class TestMatchState extends MatchState {
       };
     }
     
-    // Calculate totals
+    // CRITICAL FIX: Handle innings victory (3 innings only)
+    if (!this.allInnings.fourth) {
+      // Only 3 innings completed - this is an innings victory
+      const team1Total = this.allInnings.first.runs + this.allInnings.third.runs;
+      const team2Total = this.allInnings.second.runs;
+      
+      if (team1Total > team2Total) {
+        const margin = team1Total - team2Total;
+        return {
+          result: 'win',
+          winner: this.team1,
+          margin: `innings and ${margin} runs`,
+          description: `${this.team1.name} WON BY INNINGS AND ${margin} RUNS`
+        };
+      }
+      
+      // Should not happen but handle it
+      return {
+        result: 'draw',
+        winner: null,
+        margin: null,
+        description: 'MATCH DRAWN'
+      };
+    }
+    
+    // Calculate totals (all 4 innings completed)
     const team1Total = this.allInnings.first.runs + (this.allInnings.third?.runs || 0);
     const team2Total = this.allInnings.second.runs + (this.allInnings.fourth?.runs || 0);
     
