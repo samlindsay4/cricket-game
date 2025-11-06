@@ -281,51 +281,51 @@ const TestMatchLive = ({ onNavigate }) => {
     
     // Switch innings in background
     setTimeout(() => {
-      // Add innings summary commentary before switching
+      // Add innings summary commentary
       const inningsSummary = `END OF INNINGS: ${matchState.battingTeam.name} ${matchState.score}/${matchState.wickets}`
       matchState.commentary.push(inningsSummary)
       
-      // CRITICAL FIX: Call switchInnings() - this handles innings victory checks in testMatchSimulator.js switchInnings() method
+      // Switch to next innings
       matchState.switchInnings()
       
-      // AFTER switching, check if match became complete
+      // Check if match is now complete (after switching)
+      // This will catch innings victories detected in isMatchComplete()
       if (matchState.isMatchComplete()) {
         setShowInningsSummary(false)
         setMatchPhase('complete')
         return
       }
       
-      // Clear "waiting for match to begin" message if present
+      // Clear waiting message
       matchState.commentary = matchState.commentary.filter(c => 
         !c.toLowerCase().includes('waiting for match')
       )
       
-      // Add proper innings start commentary
+      // Add innings start commentary
       if (matchState.inningsNumber === 2) {
-        const trail = matchState.allInnings.first.runs;
-        matchState.commentary.push(`${matchState.battingTeam.name} begin their reply...`);
-        matchState.commentary.push(`They need ${trail + 1} runs to avoid follow-on`);
+        const trail = matchState.allInnings.first.runs
+        matchState.commentary.push(`${matchState.battingTeam.name} begin their reply...`)
+        matchState.commentary.push(`They need ${trail + 1} runs to avoid follow-on`)
       } else if (matchState.inningsNumber === 3) {
         if (matchState.followOnEnforced) {
-          matchState.commentary.push(`FOLLOW-ON ENFORCED!`);
-          matchState.commentary.push(`${matchState.battingTeam.name} bat again...`);
+          matchState.commentary.push(`FOLLOW-ON ENFORCED!`)
+          matchState.commentary.push(`${matchState.battingTeam.name} bat again...`)
         } else {
-          matchState.commentary.push(`3rd innings begins...`);
-          matchState.commentary.push(`${matchState.battingTeam.name} bat again`);
+          matchState.commentary.push(`3rd innings begins...`)
+          matchState.commentary.push(`${matchState.battingTeam.name} bat again`)
         }
       } else if (matchState.inningsNumber === 4) {
-        // Target = (Team1's 1st + Team1's 2nd) - (Team2's 1st) + 1
-        const team1Total = matchState.allInnings.first.runs + matchState.allInnings.third.runs;
-        const team2Total = matchState.allInnings.second.runs;
-        const target = team1Total - team2Total + 1;
-        matchState.commentary.push(`FINAL INNINGS`);
-        matchState.commentary.push(`${matchState.battingTeam.name} need ${target} runs to win`);
+        const team1Total = matchState.allInnings.first.runs + matchState.allInnings.third.runs
+        const team2Total = matchState.allInnings.second.runs
+        const target = team1Total - team2Total + 1
+        matchState.commentary.push(`FINAL INNINGS`)
+        matchState.commentary.push(`${matchState.battingTeam.name} need ${target} runs to win`)
       }
       
-      // Initialize new innings batsmen
+      // Initialize new innings
       matchState.initializeBatsmen(matchState.battingTeam.players)
       
-      // Set initial bowler and reset bowling manager
+      // Set initial bowler
       const bowlers = getBowlers(matchState.bowlingTeam.players)
       const manager = new BowlingManager(bowlers)
       
