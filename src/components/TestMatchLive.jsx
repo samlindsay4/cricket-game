@@ -270,7 +270,35 @@ const TestMatchLive = ({ onNavigate }) => {
     
     // Switch innings in background
     setTimeout(() => {
+      // Add innings summary commentary before switching
+      const inningsSummary = `END OF INNINGS: ${matchState.battingTeam.name} ${matchState.score}/${matchState.wickets}`
+      matchState.commentary.push(inningsSummary)
+      
       matchState.switchInnings()
+      
+      // Clear "waiting for match to begin" message if present
+      matchState.commentary = matchState.commentary.filter(c => 
+        !c.toLowerCase().includes('waiting for match')
+      )
+      
+      // Add proper innings start commentary
+      if (matchState.inningsNumber === 2) {
+        const trail = matchState.allInnings.first.runs;
+        matchState.commentary.push(`${matchState.battingTeam.name} begin their reply...`);
+        matchState.commentary.push(`They need ${trail + 1} runs to avoid follow-on`);
+      } else if (matchState.inningsNumber === 3) {
+        if (matchState.followOnEnforced) {
+          matchState.commentary.push(`FOLLOW-ON ENFORCED!`);
+          matchState.commentary.push(`${matchState.battingTeam.name} bat again...`);
+        } else {
+          matchState.commentary.push(`3rd innings begins...`);
+          matchState.commentary.push(`${matchState.battingTeam.name} bat again`);
+        }
+      } else if (matchState.inningsNumber === 4) {
+        const target = matchState.allInnings.first.runs + matchState.allInnings.third.runs + 1 - matchState.allInnings.second.runs;
+        matchState.commentary.push(`FINAL INNINGS`);
+        matchState.commentary.push(`${matchState.battingTeam.name} need ${target} runs to win`);
+      }
       
       // Initialize new innings batsmen
       matchState.initializeBatsmen(matchState.battingTeam.players)
@@ -294,24 +322,25 @@ const TestMatchLive = ({ onNavigate }) => {
     if (!bowlingManager) return
     
     const currentOver = Math.floor(matchState.balls / 6)
-    const currentBowler = matchState.bowler
+    const previousBowler = matchState.bowler
     
     // Update spell tracking for current bowler
-    bowlingManager.updateSpell(currentBowler, currentOver)
+    bowlingManager.updateSpell(previousBowler, currentOver)
     
-    // Check if bowler should be changed
-    const currentSpell = bowlingManager.currentSpells.get(currentBowler.id) || 0
-    const shouldChange = bowlingManager.shouldChangeBowler(currentBowler, currentSpell, matchState)
+    // Check if bowler should be rested (end of spell)
+    const currentSpell = bowlingManager.currentSpells.get(previousBowler.id) || 0
+    const shouldRest = bowlingManager.shouldChangeBowler(previousBowler, currentSpell, matchState)
     
-    if (shouldChange) {
-      // Rest current bowler
-      bowlingManager.restBowler(currentBowler, currentOver)
-      
-      // Select next bowler
-      const nextBowler = bowlingManager.selectNextBowler(currentOver, matchState, currentBowler)
-      matchState.bowler = nextBowler
-      matchState.currentBowlerOvers = 0
+    if (shouldRest) {
+      // Rest current bowler (marks them as needing extended rest)
+      bowlingManager.restBowler(previousBowler, currentOver)
     }
+    
+    // ALWAYS select next bowler (can't bowl consecutive overs)
+    // Pass previousBowler to ensure they are excluded from selection
+    const nextBowler = bowlingManager.selectNextBowler(currentOver, matchState, previousBowler)
+    matchState.bowler = nextBowler
+    matchState.currentBowlerOvers = 0
   }
   
   // Restart match

@@ -66,54 +66,55 @@ export class BowlingManager {
    * Select the next bowler based on current match situation
    * @param {number} currentOver - Current over number
    * @param {Object} matchState - Current match state
-   * @param {Object} currentBowler - Current bowler (to avoid selecting same bowler)
+   * @param {Object} previousBowler - Previous bowler (MUST be excluded - can't bowl consecutive overs)
    * @returns {Object} Next bowler to bowl
    */
-  selectNextBowler(currentOver, matchState, currentBowler = null) {
+  selectNextBowler(currentOver, matchState, previousBowler = null) {
     // Opening spell (overs 1-10): Opening bowlers alternate ends
     if (currentOver < 10) {
-      return this.selectOpeningBowler(currentOver, currentBowler)
+      return this.selectOpeningBowler(currentOver, previousBowler)
     }
     
     // First change period (overs 10-25)
     if (currentOver < 25) {
-      return this.selectFirstChangeBowler(currentOver, currentBowler)
+      return this.selectFirstChangeBowler(currentOver, previousBowler)
     }
     
     // Middle overs (25+): Rotate based on situation
-    return this.selectMiddleOversBowler(currentOver, matchState, currentBowler)
+    return this.selectMiddleOversBowler(currentOver, matchState, previousBowler)
   }
   
   /**
    * Select opening bowler (overs 1-10)
    */
-  selectOpeningBowler(currentOver, currentBowler) {
+  selectOpeningBowler(currentOver, previousBowler) {
     if (this.openingBowlers.length === 0) {
       return this.allBowlers[0]
     }
     
     // Alternate between the two opening bowlers
-    if (!currentBowler) {
+    if (!previousBowler) {
       return this.openingBowlers[0]
     }
     
-    // Find the other opening bowler
-    const currentIsOpener = this.openingBowlers.findIndex(b => b.id === currentBowler.id)
-    if (currentIsOpener >= 0) {
-      const nextIndex = (currentIsOpener + 1) % this.openingBowlers.length
-      return this.openingBowlers[nextIndex]
+    // CRITICAL: Exclude previous bowler (can't bowl consecutive overs)
+    const availableOpeners = this.openingBowlers.filter(b => b.id !== previousBowler.id)
+    
+    if (availableOpeners.length > 0) {
+      return availableOpeners[0]
     }
     
+    // Fallback: if somehow all openers excluded, use first opener
     return this.openingBowlers[0]
   }
   
   /**
    * Select first change bowler (overs 10-25)
    */
-  selectFirstChangeBowler(currentOver, currentBowler) {
-    // Bring on first change bowlers
+  selectFirstChangeBowler(currentOver, previousBowler) {
+    // Bring on first change bowlers (excluding previous bowler)
     const availableFirstChange = this.firstChange.filter(b => 
-      this.canBowlAgain(b, currentOver)
+      this.canBowlAgain(b, currentOver) && b.id !== previousBowler?.id
     )
     
     if (availableFirstChange.length > 0) {
@@ -124,29 +125,29 @@ export class BowlingManager {
       return availableFirstChange[0]
     }
     
-    // Fall back to opening bowlers if rested
+    // Fall back to opening bowlers if rested (excluding previous bowler)
     const availableOpeners = this.openingBowlers.filter(b =>
-      this.canBowlAgain(b, currentOver) && b.id !== currentBowler?.id
+      this.canBowlAgain(b, currentOver) && b.id !== previousBowler?.id
     )
     
     if (availableOpeners.length > 0) {
       return availableOpeners[0]
     }
     
-    // Last resort: any bowler who can bowl
-    return this.findAnyAvailableBowler(currentOver, currentBowler)
+    // Last resort: any bowler who can bowl (excluding previous bowler)
+    return this.findAnyAvailableBowler(currentOver, previousBowler)
   }
   
   /**
    * Select bowler for middle overs (25+)
    */
-  selectMiddleOversBowler(currentOver, matchState, currentBowler) {
+  selectMiddleOversBowler(currentOver, matchState, previousBowler) {
     const availableBowlers = []
     
     // Consider spinners (higher priority after 20 overs)
     if (currentOver >= 20 && this.spinners.length > 0) {
       for (const spinner of this.spinners) {
-        if (this.canBowlAgain(spinner, currentOver) && spinner.id !== currentBowler?.id) {
+        if (this.canBowlAgain(spinner, currentOver) && spinner.id !== previousBowler?.id) {
           availableBowlers.push({ bowler: spinner, priority: 3 })
         }
       }
@@ -154,20 +155,20 @@ export class BowlingManager {
     
     // Consider opening bowlers (rested)
     for (const opener of this.openingBowlers) {
-      if (this.canBowlAgain(opener, currentOver) && opener.id !== currentBowler?.id) {
+      if (this.canBowlAgain(opener, currentOver) && opener.id !== previousBowler?.id) {
         availableBowlers.push({ bowler: opener, priority: 2 })
       }
     }
     
     // Consider first change
     for (const bowler of this.firstChange) {
-      if (this.canBowlAgain(bowler, currentOver) && bowler.id !== currentBowler?.id) {
+      if (this.canBowlAgain(bowler, currentOver) && bowler.id !== previousBowler?.id) {
         availableBowlers.push({ bowler: bowler, priority: 1 })
       }
     }
     
     if (availableBowlers.length === 0) {
-      return this.findAnyAvailableBowler(currentOver, currentBowler)
+      return this.findAnyAvailableBowler(currentOver, previousBowler)
     }
     
     // Sort by priority (highest first), then by overs bowled (least first)
@@ -184,15 +185,23 @@ export class BowlingManager {
   /**
    * Find any available bowler (emergency fallback)
    */
-  findAnyAvailableBowler(currentOver, currentBowler) {
+  findAnyAvailableBowler(currentOver, previousBowler) {
+    // CRITICAL: Filter out previous bowler (can't bowl consecutive overs)
     for (const bowler of this.allBowlers) {
-      if (bowler.id !== currentBowler?.id && this.canBowlAgain(bowler, currentOver)) {
+      if (bowler.id !== previousBowler?.id && this.canBowlAgain(bowler, currentOver)) {
         return bowler
       }
     }
     
-    // Absolute last resort: return current bowler or first bowler
-    return currentBowler || this.allBowlers[0]
+    // If no one has rested enough, pick any bowler except previous
+    for (const bowler of this.allBowlers) {
+      if (bowler.id !== previousBowler?.id) {
+        return bowler
+      }
+    }
+    
+    // Absolute last resort: if only one bowler exists, return first bowler
+    return this.allBowlers[0]
   }
   
   /**
