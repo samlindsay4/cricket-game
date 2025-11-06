@@ -88,14 +88,45 @@ export class TestMatchState extends MatchState {
    * Check if match is complete
    */
   isMatchComplete() {
+    // Check for innings victory FIRST (before other checks)
+    // This happens when one team only batted once, other team batted twice
+    
+    // Scenario 1: Follow-on - Team batting 2nd batted twice (innings 2 and 3)
+    // Team A: 300 (1st), Team B: 100 (2nd), Team B: 120 (3rd, follow-on)
+    // Team A wins by innings and 80 runs (300 - 220 = 80)
+    if (this.inningsNumber === 3 && this.followOnEnforced && this.wickets >= 10) {
+      // Follow-on was enforced, team batting twice is now all out in 3rd innings
+      const teamBattedOnceRuns = this.allInnings.first.runs;
+      const teamBattedTwiceRuns = this.allInnings.second.runs + this.score;
+      
+      if (teamBattedOnceRuns > teamBattedTwiceRuns) {
+        // Innings victory!
+        return true;
+      }
+    }
+    
+    // Scenario 2: Team batting 1st and 3rd gets out cheaply in 3rd innings
+    // Team A: 300 (1st), Team B: 400 (2nd), Team A: 50 (3rd, all out)
+    // Team B wins by innings and 50 runs (400 - 350 = 50)
+    if (this.inningsNumber === 3 && !this.followOnEnforced && this.wickets >= 10) {
+      // Team batted 1st and 3rd, now all out in 3rd innings
+      const team1Total = this.allInnings.first.runs + this.score;
+      const team2Total = this.allInnings.second.runs;
+      
+      if (team2Total > team1Total) {
+        // Innings victory!
+        return true;
+      }
+    }
+    
     // All 4 innings completed
     if (this.inningsNumber > 4) return true;
     
-    // Team bowled out twice
+    // 4th innings: Team bowled out
     if (this.inningsNumber === 4 && this.wickets >= 10) return true;
     
-    // Team successfully chased target
-    if (this.inningsNumber === 4) {
+    // 4th innings: Team successfully chased target
+    if (this.inningsNumber === 4 && this.allInnings.fourth) {
       const target = this.allInnings.first.runs + this.allInnings.third.runs + 1;
       const currentTotal = this.allInnings.second.runs + this.score;
       if (currentTotal >= target) return true;
@@ -257,29 +288,6 @@ export class TestMatchState extends MatchState {
         break;
     }
     
-    // CRITICAL FIX: Check for innings victory after 3rd innings
-    if (this.inningsNumber === 3) {
-      // After 3rd innings, check if Team1 has already won
-      // Team1 total = 1st innings + 3rd innings
-      // Team2 total = 2nd innings (4th innings not started yet)
-      const team1Total = this.allInnings.first.runs + this.allInnings.third.runs;
-      const team2Total = this.allInnings.second.runs;
-      
-      if (team1Total > team2Total) {
-        // Team1 has already won by innings (Team2 can't catch up even with 4th innings)
-        // Don't increment innings number - match is complete
-        this.matchResult = {
-          result: 'win',
-          winner: this.team1,
-          margin: `innings and ${team1Total - team2Total} runs`,
-          description: `${this.team1.name} WON BY INNINGS AND ${team1Total - team2Total} RUNS`
-        };
-        // Set innings number to indicate match is complete
-        this.inningsNumber = MATCH_COMPLETE_INNINGS;
-        return;
-      }
-    }
-    
     this.inningsNumber++;
     
     // CRITICAL FIX: Correct Test cricket innings order
@@ -433,13 +441,51 @@ export class TestMatchState extends MatchState {
    * Determine match result
    */
   determineMatchResult() {
-    // Check if match result was already set (e.g., innings victory)
+    // Check if match result was already set
     if (this.matchResult) {
       return this.matchResult;
     }
     
     // Not complete yet
     if (!this.isMatchComplete()) return null;
+    
+    // INNINGS VICTORY - Scenario 1: Follow-on enforced
+    // Team A: 300 (1st), Team B: 100 (2nd), Team B: 120 (3rd)
+    // Team A wins by innings and 80 runs
+    if (this.inningsNumber === 3 && this.followOnEnforced) {
+      const teamBattedOnceRuns = this.allInnings.first.runs;
+      const teamBattedTwiceRuns = this.allInnings.second.runs + this.allInnings.third.runs;
+      
+      if (teamBattedOnceRuns > teamBattedTwiceRuns) {
+        const margin = teamBattedOnceRuns - teamBattedTwiceRuns;
+        
+        return {
+          result: 'win',
+          winner: this.team1,  // Team who batted first (only once)
+          margin: `innings and ${margin} runs`,
+          description: `${this.team1.name} WON BY AN INNINGS AND ${margin} RUNS`
+        };
+      }
+    }
+    
+    // INNINGS VICTORY - Scenario 2: Team batting 1st and 3rd all out cheaply
+    // Team A: 300 (1st), Team B: 400 (2nd), Team A: 50 (3rd)
+    // Team B wins by innings and 50 runs
+    if (this.inningsNumber === 3 && !this.followOnEnforced) {
+      const team1Total = this.allInnings.first.runs + this.allInnings.third.runs;
+      const team2Total = this.allInnings.second.runs;
+      
+      if (team2Total > team1Total) {
+        const margin = team2Total - team1Total;
+        
+        return {
+          result: 'win',
+          winner: this.team2,  // Team who batted second (only once)
+          margin: `innings and ${margin} runs`,
+          description: `${this.team2.name} WON BY AN INNINGS AND ${margin} RUNS`
+        };
+      }
+    }
     
     // Drawn match (time ran out)
     if (this.day > this.matchDays) {
@@ -461,23 +507,9 @@ export class TestMatchState extends MatchState {
       };
     }
     
-    // CRITICAL FIX: Handle innings victory (3 innings only)
+    // Normal result: All 4 innings completed
     if (!this.allInnings.fourth) {
-      // Only 3 innings completed - this is an innings victory
-      const team1Total = this.allInnings.first.runs + this.allInnings.third.runs;
-      const team2Total = this.allInnings.second.runs;
-      
-      if (team1Total > team2Total) {
-        const margin = team1Total - team2Total;
-        return {
-          result: 'win',
-          winner: this.team1,
-          margin: `innings and ${margin} runs`,
-          description: `${this.team1.name} WON BY INNINGS AND ${margin} RUNS`
-        };
-      }
-      
-      // Should not happen but handle it
+      // Match drawn (not all 4 innings completed)
       return {
         result: 'draw',
         winner: null,
@@ -487,8 +519,8 @@ export class TestMatchState extends MatchState {
     }
     
     // Calculate totals (all 4 innings completed)
-    const team1Total = this.allInnings.first.runs + (this.allInnings.third?.runs || 0);
-    const team2Total = this.allInnings.second.runs + (this.allInnings.fourth?.runs || 0);
+    const team1Total = this.allInnings.first.runs + this.allInnings.third.runs;
+    const team2Total = this.allInnings.second.runs + this.allInnings.fourth.runs;
     
     if (team1Total > team2Total) {
       const margin = team1Total - team2Total;
@@ -499,7 +531,7 @@ export class TestMatchState extends MatchState {
         description: `${this.team1.name} WON BY ${margin} RUNS`
       };
     } else if (team2Total > team1Total) {
-      const wicketsRemaining = 10 - this.wickets;
+      const wicketsRemaining = 10 - this.allInnings.fourth.wickets;
       return {
         result: 'win',
         winner: this.team2,
@@ -507,7 +539,7 @@ export class TestMatchState extends MatchState {
         description: `${this.team2.name} WON BY ${wicketsRemaining} WICKETS`
       };
     } else {
-      // Extremely rare - tied Test match
+      // Tied Test match
       return {
         result: 'tie',
         winner: null,
