@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import TeletextPage from './TeletextPage'
 import TestMatchScorecard from './TestMatchScorecard'
 import SessionSummary from './SessionSummary'
+import InningsSummary from './InningsSummary'
 import CommentaryFeed from './CommentaryFeed'
 import TeletextButton from './TeletextButton'
 import { TestMatchState, simulateTestBall } from '../engine/testMatchSimulator.js'
@@ -26,6 +27,8 @@ const TestMatchLive = ({ onNavigate }) => {
   const [team2Data, setTeam2Data] = useState(null)
   const [showSessionSummary, setShowSessionSummary] = useState(false)
   const [sessionSummaryData, setSessionSummaryData] = useState(null)
+  const [showInningsSummary, setShowInningsSummary] = useState(false)
+  const [inningsSummaryData, setInningsSummaryData] = useState(null)
   
   // Initialize match on component mount
   useEffect(() => {
@@ -228,15 +231,38 @@ const TestMatchLive = ({ onNavigate }) => {
     setMatchState(Object.assign(Object.create(Object.getPrototypeOf(matchState)), matchState))
   }
   
+  // Continue from innings break
+  const handleContinueFromInnings = () => {
+    setShowInningsSummary(false)
+    setMatchPhase('playing')
+  }
+  
   // Handle innings completion
   const handleInningsComplete = () => {
+    // Check if match is complete
     if (matchState.isMatchComplete()) {
       setMatchPhase('complete')
       return
     }
     
-    setMatchPhase('innings_break')
+    // Get top batsmen and bowlers for innings summary
+    const topBatsmen = getTopBatsmen(matchState.batsmanStats, matchState.battingTeam.players, 5)
+    const topBowlers = getTopBowlers(matchState.bowlerStats, matchState.bowlingTeam.players, 5)
     
+    const summary = {
+      inningsNumber: matchState.inningsNumber,
+      teamName: matchState.battingTeam.name,
+      totalRuns: matchState.score,
+      totalWickets: matchState.wickets,
+      overs: ballsToOvers(matchState.balls),
+      topBatsmen,
+      topBowlers
+    }
+    
+    setInningsSummaryData(summary)
+    setShowInningsSummary(true)
+    
+    // Switch innings in background
     setTimeout(() => {
       matchState.switchInnings()
       
@@ -251,8 +277,7 @@ const TestMatchLive = ({ onNavigate }) => {
       }
       
       setMatchState(Object.assign(Object.create(Object.getPrototypeOf(matchState)), matchState))
-      setMatchPhase('playing')
-    }, 3000)
+    }, 1000)
   }
   
   // Rotate bowler
@@ -369,31 +394,14 @@ const TestMatchLive = ({ onNavigate }) => {
     )
   }
   
-  // Innings break screen
-  if (matchPhase === 'innings_break') {
-    const inningsJustCompleted = matchState.inningsNumber - 1
-    const inningsData = matchState.allInnings[
-      inningsJustCompleted === 1 ? 'first' :
-      inningsJustCompleted === 2 ? 'second' :
-      inningsJustCompleted === 3 ? 'third' : 'fourth'
-    ]
-    
+  // Innings summary screen
+  if (showInningsSummary && inningsSummaryData) {
     return (
       <TeletextPage pageNumber="P300" title="THE ASHES 2025">
-        <div className="teletext-block teletext-block--cyan">
-          <h2 className="teletext-subtitle" style={{ color: '#000000' }}>
-            END OF INNINGS {inningsJustCompleted}
-          </h2>
-        </div>
-        
-        <div className="teletext-block">
-          <p className="teletext-text teletext-text--yellow" style={{ fontSize: '1.2rem' }}>
-            {inningsData.runs}/{inningsData.wickets} ({inningsData.overs} OV)
-          </p>
-          <p className="teletext-text teletext-text--cyan">
-            🏏 INNINGS {matchState.inningsNumber} STARTING...
-          </p>
-        </div>
+        <InningsSummary
+          {...inningsSummaryData}
+          onContinue={handleContinueFromInnings}
+        />
       </TeletextPage>
     )
   }
