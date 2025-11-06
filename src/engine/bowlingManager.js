@@ -9,6 +9,12 @@
  * - Bowler fitness and fatigue tracking
  */
 
+// Spell length limits
+const MAX_PACE_SPELL = 10      // Maximum spell length for pace bowlers
+const MAX_SPIN_SPELL = 15      // Maximum spell length for spinners
+const STANDARD_PACE_SPELL = 8  // Standard rotation for pace bowlers
+const STANDARD_SPIN_SPELL = 12 // Standard rotation for spinners
+
 /**
  * BowlingManager class - manages bowling rotation and spells
  */
@@ -299,11 +305,11 @@ export class BowlingManager {
     // CRITICAL FIX: Enforce maximum spell lengths
     // Pace bowlers: max 10 overs per spell
     // Spinners: max 15 overs per spell
-    if (isPace && currentSpell >= 10) {
+    if (isPace && currentSpell >= MAX_PACE_SPELL) {
       return true // Max spell length for pace bowlers
     }
     
-    if (isSpin && currentSpell >= 15) {
+    if (isSpin && currentSpell >= MAX_SPIN_SPELL) {
       return true // Max spell length for spinners
     }
     
@@ -327,11 +333,11 @@ export class BowlingManager {
     }
     
     // Check spell length (standard rotation)
-    if (isPace && currentSpell >= 8) {
+    if (isPace && currentSpell >= STANDARD_PACE_SPELL) {
       return true // Pace bowlers need rest after 8 overs (if not successful)
     }
     
-    if (isSpin && currentSpell >= 12) {
+    if (isSpin && currentSpell >= STANDARD_SPIN_SPELL) {
       return true // Spinners can bowl longer spells
     }
     

@@ -18,11 +18,21 @@ const MatchScorecards = ({ matchState, team1Data, team2Data, onBack }) => {
     }
   }
   
+  const getInningsLabel = (inningsNum) => {
+    // Innings 1 and 2 are each team's 1st innings
+    // Innings 3 and 4 are each team's 2nd innings
+    if (inningsNum === 1 || inningsNum === 2) {
+      return '1ST INNINGS'
+    } else {
+      return '2ND INNINGS'
+    }
+  }
+  
   const innings = [
-    { num: 1, data: matchState.allInnings.first, team: getInningsTeam(1) },
-    { num: 2, data: matchState.allInnings.second, team: getInningsTeam(2) },
-    { num: 3, data: matchState.allInnings.third, team: getInningsTeam(3) },
-    { num: 4, data: matchState.allInnings.fourth, team: getInningsTeam(4) }
+    { num: 1, data: matchState.allInnings.first, team: getInningsTeam(1), label: getInningsLabel(1) },
+    { num: 2, data: matchState.allInnings.second, team: getInningsTeam(2), label: getInningsLabel(2) },
+    { num: 3, data: matchState.allInnings.third, team: getInningsTeam(3), label: getInningsLabel(3) },
+    { num: 4, data: matchState.allInnings.fourth, team: getInningsTeam(4), label: getInningsLabel(4) }
   ].filter(inn => inn.data && inn.data.runs !== undefined)
   
   // Format fall of wickets for display
@@ -59,7 +69,7 @@ const MatchScorecards = ({ matchState, team1Data, team2Data, onBack }) => {
               minWidth: '120px'
             }}
           >
-            {inn.num === 1 || inn.num === 3 ? '1ST' : '2ND'} INN ({inn.team})
+            {inn.team} - {inn.label}
           </button>
         ))}
       </div>
@@ -70,7 +80,7 @@ const MatchScorecards = ({ matchState, team1Data, team2Data, onBack }) => {
           <div key={inn.num} className="innings-scorecard">
             <div className="teletext-block teletext-block--yellow" style={{ marginBottom: '0.5rem' }}>
               <h3 className="teletext-subtitle" style={{ color: '#000000' }}>
-                {inn.team} - {inn.num === 1 || inn.num === 3 ? '1ST' : '2ND'} INNINGS
+                {inn.team} - {inn.label}
               </h3>
             </div>
             
