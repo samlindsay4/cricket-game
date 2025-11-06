@@ -455,14 +455,17 @@ export class TestMatchState extends MatchState {
     if (this.inningsNumber === 3 && this.followOnEnforced) {
       const teamBattedOnceRuns = this.allInnings.first.runs;
       const teamBattedTwiceRuns = this.allInnings.second.runs + this.allInnings.third.runs;
-      const margin = teamBattedOnceRuns - teamBattedTwiceRuns;
       
-      return {
-        result: 'win',
-        winner: this.team1,  // Team who batted first (only once)
-        margin: `innings and ${margin} runs`,
-        description: `${this.team1.name} WON BY AN INNINGS AND ${margin} RUNS`
-      };
+      if (teamBattedOnceRuns > teamBattedTwiceRuns) {
+        const margin = teamBattedOnceRuns - teamBattedTwiceRuns;
+        
+        return {
+          result: 'win',
+          winner: this.team1,  // Team who batted first (only once)
+          margin: `innings and ${margin} runs`,
+          description: `${this.team1.name} WON BY AN INNINGS AND ${margin} RUNS`
+        };
+      }
     }
     
     // INNINGS VICTORY - Scenario 2: Team batting 1st and 3rd all out cheaply
