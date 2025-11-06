@@ -62,40 +62,54 @@ const SessionSummary = ({
       {topBatsmen && topBatsmen.length > 0 && (
         <div className="teletext-block" style={{ marginBottom: '1rem' }}>
           <h3 className="teletext-subtitle" style={{ color: '#00FF00' }}>TOP BATSMEN:</h3>
+          {/* CRITICAL FIX: Use same table styling as live scorecard */}
           <div style={{ 
             display: 'grid', 
-            gridTemplateColumns: '2fr 1fr 1fr',
+            gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr',
             gap: '0.5rem',
-            marginTop: '0.5rem'
+            borderBottom: '1px solid #666',
+            paddingBottom: '0.3rem',
+            marginBottom: '0.5rem',
+            marginTop: '0.5rem',
+            fontSize: '0.85rem',
+            color: '#00FFFF'
           }}>
-            {topBatsmen.map((batsman, idx) => (
-              <React.Fragment key={idx}>
-                <div style={{ 
-                  fontSize: '0.9rem', 
-                  color: batsman.isOut ? '#FFFFFF' : '#FFFF00',
-                  fontFamily: 'monospace' 
-                }}>
-                  {batsman.name}{batsman.isOut ? '' : '*'}
-                </div>
-                <div style={{ 
-                  fontSize: '0.9rem', 
-                  color: '#00FF00', 
-                  textAlign: 'right',
-                  fontFamily: 'monospace' 
-                }}>
-                  {batsman.runs}
-                </div>
-                <div style={{ 
-                  fontSize: '0.9rem', 
-                  color: '#FFFFFF', 
-                  textAlign: 'right',
-                  fontFamily: 'monospace' 
-                }}>
-                  ({batsman.balls})
-                </div>
-              </React.Fragment>
-            ))}
+            <div>BATSMAN</div>
+            <div style={{ textAlign: 'right' }}>R</div>
+            <div style={{ textAlign: 'right' }}>B</div>
+            <div style={{ textAlign: 'right' }}>4s</div>
+            <div style={{ textAlign: 'right' }}>6s</div>
           </div>
+          {topBatsmen.map((batsman, idx) => (
+            <div 
+              key={idx}
+              style={{ 
+                display: 'grid', 
+                gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr',
+                gap: '0.5rem',
+                paddingBottom: '0.3rem',
+                fontSize: '0.9rem'
+              }}
+            >
+              <div style={{ 
+                color: batsman.isOut ? '#FFFFFF' : '#FFFF00'
+              }}>
+                {batsman.name}{batsman.isOut ? '' : '*'}
+              </div>
+              <div style={{ textAlign: 'right', color: '#00FF00' }}>
+                {batsman.runs}
+              </div>
+              <div style={{ textAlign: 'right', color: '#FFFFFF' }}>
+                {batsman.balls}
+              </div>
+              <div style={{ textAlign: 'right', color: '#FFFFFF' }}>
+                {batsman.fours || 0}
+              </div>
+              <div style={{ textAlign: 'right', color: '#FFFFFF' }}>
+                {batsman.sixes || 0}
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
@@ -103,40 +117,52 @@ const SessionSummary = ({
       {topBowlers && topBowlers.length > 0 && (
         <div className="teletext-block" style={{ marginBottom: '1rem' }}>
           <h3 className="teletext-subtitle" style={{ color: '#FF00FF' }}>TOP BOWLERS:</h3>
+          {/* CRITICAL FIX: Use same table styling as live scorecard */}
           <div style={{ 
             display: 'grid', 
-            gridTemplateColumns: '2fr 1fr 1fr',
+            gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr',
             gap: '0.5rem',
-            marginTop: '0.5rem'
+            borderBottom: '1px solid #666',
+            paddingBottom: '0.3rem',
+            marginBottom: '0.5rem',
+            marginTop: '0.5rem',
+            fontSize: '0.85rem',
+            color: '#00FFFF'
           }}>
-            {topBowlers.map((bowler, idx) => (
-              <React.Fragment key={idx}>
-                <div style={{ 
-                  fontSize: '0.9rem', 
-                  color: '#FFFFFF',
-                  fontFamily: 'monospace' 
-                }}>
-                  {bowler.name}
-                </div>
-                <div style={{ 
-                  fontSize: '0.9rem', 
-                  color: '#00FF00', 
-                  textAlign: 'right',
-                  fontFamily: 'monospace' 
-                }}>
-                  {bowler.wickets}/{bowler.runs}
-                </div>
-                <div style={{ 
-                  fontSize: '0.9rem', 
-                  color: '#FFFFFF', 
-                  textAlign: 'right',
-                  fontFamily: 'monospace' 
-                }}>
-                  ({bowler.overs} ov)
-                </div>
-              </React.Fragment>
-            ))}
+            <div>BOWLING</div>
+            <div style={{ textAlign: 'right' }}>O</div>
+            <div style={{ textAlign: 'right' }}>M</div>
+            <div style={{ textAlign: 'right' }}>R</div>
+            <div style={{ textAlign: 'right' }}>W</div>
           </div>
+          {topBowlers.map((bowler, idx) => (
+            <div 
+              key={idx}
+              style={{ 
+                display: 'grid', 
+                gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr',
+                gap: '0.5rem',
+                paddingBottom: '0.3rem',
+                fontSize: '0.9rem'
+              }}
+            >
+              <div style={{ color: '#FFFFFF' }}>
+                {bowler.name}
+              </div>
+              <div style={{ textAlign: 'right', color: '#FFFFFF' }}>
+                {bowler.overs}
+              </div>
+              <div style={{ textAlign: 'right', color: '#FFFFFF' }}>
+                {bowler.maidens || 0}
+              </div>
+              <div style={{ textAlign: 'right', color: '#FF0000' }}>
+                {bowler.runs}
+              </div>
+              <div style={{ textAlign: 'right', color: '#00FF00' }}>
+                {bowler.wickets}
+              </div>
+            </div>
+          ))}
         </div>
       )}
 

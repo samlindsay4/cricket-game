@@ -15,9 +15,9 @@
   --teletext-white: #FFFFFF;
   
   /* Semi-transparent variants for overlays */
-  --teletext-black-semi: var(--teletext-black-semi);
-  --teletext-black-overlay: var(--teletext-black-overlay);
-  --teletext-blue-semi: var(--teletext-blue-semi);
+  --teletext-black-semi: rgba(0, 0, 0, 0.7);
+  --teletext-black-overlay: rgba(0, 0, 0, 0.9);
+  --teletext-blue-semi: rgba(0, 0, 255, 0.7);
   
   /* Background and text defaults */
   --bg-color: var(--teletext-black);
@@ -711,17 +711,20 @@ body::before {
   border-left-color: var(--teletext-white);
 }
 
+/* CRITICAL FIX: Wickets = RED background */
 .commentary-item--wicket {
-  background-color: rgba(255, 0, 0, 0.3);
+  background-color: var(--teletext-red);
   color: var(--teletext-white);
   border-left-color: var(--teletext-red);
   font-weight: bold;
 }
 
+/* CRITICAL FIX: Boundaries = GREEN background */
 .commentary-item--boundary {
-  background-color: rgba(0, 255, 0, 0.3);
-  color: var(--teletext-white);
+  background-color: var(--teletext-green);
+  color: var(--teletext-black);
   border-left-color: var(--teletext-green);
+  font-weight: bold;
 }
 
 .commentary-item--milestone {
@@ -729,6 +732,25 @@ body::before {
   color: var(--teletext-black);
   border-left-color: var(--teletext-yellow);
   font-weight: bold;
+}
+
+/* CRITICAL FIX: Runs (1,2,3) = CYAN background */
+.commentary-item--runs {
+  background-color: var(--teletext-cyan);
+  color: var(--teletext-black);
+  border-left-color: var(--teletext-cyan);
+}
+
+/* CRITICAL FIX: Chances/edges = BOLD with warning icon */
+.commentary-item--chance {
+  background-color: rgba(255, 255, 0, 0.2);
+  color: var(--teletext-white);
+  border-left-color: var(--teletext-yellow);
+  font-weight: bold;
+}
+
+.commentary-item--chance::before {
+  content: '⚠️ ';
 }
 
 /* Scrollbar styling for commentary */

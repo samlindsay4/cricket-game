@@ -23,12 +23,35 @@ const CommentaryFeed = ({ commentary = [], maxItems = 10 }) => {
   const getCommentaryClass = (text) => {
     const lowerText = text.toLowerCase()
     
-    if (lowerText.includes('wicket') || lowerText.includes('out') || lowerText.includes('w')) {
+    // CRITICAL FIX: Wickets should be RED background
+    if (lowerText.includes('wicket') || lowerText.includes('out') || lowerText.includes('bowled') || 
+        lowerText.includes('caught') || lowerText.includes('lbw') || lowerText.includes(' w ')) {
       return 'commentary-item--wicket'
-    } else if (lowerText.includes('four') || lowerText.includes('six') || lowerText.includes('boundary')) {
+    }
+    
+    // CRITICAL FIX: Boundaries (4s and 6s) should be GREEN background
+    if (lowerText.includes('four') || lowerText.includes('six') || lowerText.includes('boundary') ||
+        lowerText.includes('maximum')) {
       return 'commentary-item--boundary'
-    } else if (lowerText.includes('50') || lowerText.includes('100') || lowerText.includes('century') || lowerText.includes('half-century')) {
+    }
+    
+    // Milestones (50s, 100s)
+    if (lowerText.includes('50') || lowerText.includes('100') || lowerText.includes('century') || 
+        lowerText.includes('half-century') || lowerText.includes('maiden')) {
       return 'commentary-item--milestone'
+    }
+    
+    // CRITICAL FIX: Runs (1, 2, 3) should be CYAN background
+    if (lowerText.includes('single') || lowerText.includes('two runs') || lowerText.includes('three runs') ||
+        lowerText.includes('take two') || lowerText.includes('take three') || lowerText.includes('couple') ||
+        lowerText.match(/\btwo\b/) || lowerText.match(/\bthree\b/)) {
+      return 'commentary-item--runs'
+    }
+    
+    // CRITICAL FIX: Chances/edges should be BOLD with warning icon
+    if (lowerText.includes('edge') || lowerText.includes('chance') || lowerText.includes('dropped') ||
+        lowerText.includes('close call') || lowerText.includes('beats the bat') || lowerText.includes('play and miss')) {
+      return 'commentary-item--chance'
     }
     
     return 'commentary-item--normal'

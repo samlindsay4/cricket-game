@@ -180,10 +180,12 @@ const TestMatchLive = ({ onNavigate }) => {
         simulateTestBall(matchState, probabilityEngine)
         ballCount++
         
-        // Change bowler every 6-10 overs
-        if (matchState.currentBowlerOvers >= 8) {
+        // CRITICAL FIX: Only change bowler at END of over (after 6 legal balls)
+        // Check if over is complete (balls % 6 === 0) AND bowler has bowled enough
+        const isOverComplete = matchState.balls % 6 === 0
+        if (isOverComplete && matchState.currentBowlerOvers >= 6) {
           rotateBowler()
-          matchState.currentBowlerOvers = 0
+          matchState.rotateStrike() // Rotate strike at end of over
         }
         
         // Update UI periodically
@@ -518,7 +520,8 @@ const TestMatchLive = ({ onNavigate }) => {
               </>
             )}
             
-            {matchState.allInnings.fourth && (
+            {/* CRITICAL FIX: Only show 4th innings if it exists and has runs/wickets */}
+            {matchState.allInnings.fourth && matchState.allInnings.fourth.runs + matchState.allInnings.fourth.wickets > 0 && (
               <>
                 <div style={{ color: '#FFFFFF' }}>
                   {team2Data.name} 2ND INNINGS
