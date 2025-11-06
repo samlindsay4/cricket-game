@@ -2,13 +2,16 @@ import React, { useState, useEffect } from 'react'
 import TeletextPage from './TeletextPage'
 import TestMatchScorecard from './TestMatchScorecard'
 import SessionSummary from './SessionSummary'
+import InningsSummary from './InningsSummary'
 import CommentaryFeed from './CommentaryFeed'
 import TeletextButton from './TeletextButton'
 import { TestMatchState, simulateTestBall } from '../engine/testMatchSimulator.js'
 import { TestProbabilityEngine } from '../engine/testProbabilityEngine.js'
 import { MatchConditions } from '../engine/matchConditions.js'
+import { BowlingManager } from '../engine/bowlingManager.js'
 import { getEnglandSquad, getAustraliaSquad, selectTestXI, getBowlers, performToss } from '../utils/ashesHelpers.js'
 import { ballsToOvers } from '../engine/matchUtils.js'
+import { getTopBatsmen, getTopBowlers } from '../utils/matchHelpers.js'
 
 /**
  * TestMatchLive Component
@@ -17,6 +20,7 @@ import { ballsToOvers } from '../engine/matchUtils.js'
 const TestMatchLive = ({ onNavigate }) => {
   const [matchState, setMatchState] = useState(null)
   const [probabilityEngine, setProbabilityEngine] = useState(null)
+  const [bowlingManager, setBowlingManager] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSimulating, setIsSimulating] = useState(false)
   const [matchPhase, setMatchPhase] = useState('toss')
@@ -25,6 +29,8 @@ const TestMatchLive = ({ onNavigate }) => {
   const [team2Data, setTeam2Data] = useState(null)
   const [showSessionSummary, setShowSessionSummary] = useState(false)
   const [sessionSummaryData, setSessionSummaryData] = useState(null)
+  const [showInningsSummary, setShowInningsSummary] = useState(false)
+  const [inningsSummaryData, setInningsSummaryData] = useState(null)
   
   // Initialize match on component mount
   useEffect(() => {
@@ -75,14 +81,18 @@ const TestMatchLive = ({ onNavigate }) => {
       // Initialize batsmen
       newMatchState.initializeBatsmen(battingTeam.players)
       
-      // Set initial bowler
+      // Set initial bowler and create bowling manager
       const bowlers = getBowlers(bowlingTeam.players)
+      const manager = new BowlingManager(bowlers)
+      
       if (bowlers.length > 0) {
-        newMatchState.bowler = bowlers[0]
+        newMatchState.bowler = manager.selectNextBowler(0, newMatchState, null)
+        newMatchState.currentBowlerOvers = 0
       }
       
       setMatchState(newMatchState)
       setProbabilityEngine(engine)
+      setBowlingManager(manager)
       setMatchPhase('playing')
       setIsLoading(false)
     } catch (error) {
@@ -120,18 +130,23 @@ const TestMatchLive = ({ onNavigate }) => {
     setIsSimulating(true)
     
     try {
-      let ballsInOver = 0
+      // Calculate balls remaining in current over
+      const ballsInCurrentOver = matchState.balls % 6
+      const ballsToSimulate = ballsInCurrentOver === 0 ? 6 : (6 - ballsInCurrentOver)
       
-      while (ballsInOver < 6 && !matchState.isInningsComplete() && !matchState.isSessionComplete()) {
+      let legalBalls = 0
+      
+      // Simulate remaining balls to complete the over
+      while (legalBalls < ballsToSimulate && !matchState.isInningsComplete() && !matchState.isSessionComplete()) {
         const result = simulateTestBall(matchState, probabilityEngine)
-        if (result.isLegalDelivery) ballsInOver++
+        if (result.isLegalDelivery) legalBalls++
         
         await new Promise(resolve => setTimeout(resolve, 50))
         setMatchState(Object.assign(Object.create(Object.getPrototypeOf(matchState)), matchState))
       }
       
       // Rotate strike at end of over
-      if (ballsInOver === 6 && !matchState.isInningsComplete()) {
+      if (legalBalls === ballsToSimulate && !matchState.isInningsComplete()) {
         matchState.rotateStrike()
         rotateBowler()
       }
@@ -194,6 +209,10 @@ const TestMatchLive = ({ onNavigate }) => {
   
   // Handle session break
   const handleSessionBreak = () => {
+    // Get top batsmen and bowlers
+    const topBatsmen = getTopBatsmen(matchState.batsmanStats, matchState.battingTeam.players, 3)
+    const topBowlers = getTopBowlers(matchState.bowlerStats, matchState.bowlingTeam.players, 3)
+    
     const summary = {
       day: matchState.day,
       session: matchState.session,
@@ -203,7 +222,8 @@ const TestMatchLive = ({ onNavigate }) => {
       totalRuns: matchState.score,
       totalWickets: matchState.wickets,
       overs: ballsToOvers(matchState.balls),
-      wicketsFallen: matchState.fallOfWickets.slice(-3) // Last 3 wickets
+      topBatsmen,
+      topBowlers
     }
     
     setSessionSummaryData(summary)
@@ -217,50 +237,91 @@ const TestMatchLive = ({ onNavigate }) => {
     setMatchState(Object.assign(Object.create(Object.getPrototypeOf(matchState)), matchState))
   }
   
+  // Continue from innings break
+  const handleContinueFromInnings = () => {
+    setShowInningsSummary(false)
+    setMatchPhase('playing')
+  }
+  
   // Handle innings completion
   const handleInningsComplete = () => {
+    // Check if match is complete
     if (matchState.isMatchComplete()) {
       setMatchPhase('complete')
       return
     }
     
-    setMatchPhase('innings_break')
+    // Get top batsmen and bowlers for innings summary
+    const topBatsmen = getTopBatsmen(matchState.batsmanStats, matchState.battingTeam.players, 5)
+    const topBowlers = getTopBowlers(matchState.bowlerStats, matchState.bowlingTeam.players, 5)
     
+    const summary = {
+      inningsNumber: matchState.inningsNumber,
+      teamName: matchState.battingTeam.name,
+      totalRuns: matchState.score,
+      totalWickets: matchState.wickets,
+      overs: ballsToOvers(matchState.balls),
+      topBatsmen,
+      topBowlers
+    }
+    
+    setInningsSummaryData(summary)
+    setShowInningsSummary(true)
+    
+    // Switch innings in background
     setTimeout(() => {
       matchState.switchInnings()
       
       // Initialize new innings batsmen
       matchState.initializeBatsmen(matchState.battingTeam.players)
       
-      // Set initial bowler
+      // Set initial bowler and reset bowling manager
       const bowlers = getBowlers(matchState.bowlingTeam.players)
+      const manager = new BowlingManager(bowlers)
+      
       if (bowlers.length > 0) {
-        matchState.bowler = bowlers[0]
+        matchState.bowler = manager.selectNextBowler(0, matchState, null)
         matchState.currentBowlerOvers = 0
       }
       
+      setBowlingManager(manager)
       setMatchState(Object.assign(Object.create(Object.getPrototypeOf(matchState)), matchState))
-      setMatchPhase('playing')
-    }, 3000)
+    }, 1000)
   }
   
-  // Rotate bowler
+  // Rotate bowler using BowlingManager
   const rotateBowler = () => {
-    const bowlers = getBowlers(matchState.bowlingTeam.players)
-    if (bowlers.length === 0) return
+    if (!bowlingManager) return
     
-    const currentIndex = bowlers.findIndex(b => b.id === matchState.bowler.id)
-    const nextIndex = (currentIndex + 1) % Math.min(5, bowlers.length)
-    matchState.bowler = bowlers[nextIndex]
-    matchState.currentBowlerOvers = 0
+    const currentOver = Math.floor(matchState.balls / 6)
+    const currentBowler = matchState.bowler
+    
+    // Update spell tracking for current bowler
+    bowlingManager.updateSpell(currentBowler, currentOver)
+    
+    // Check if bowler should be changed
+    const currentSpell = bowlingManager.currentSpells.get(currentBowler.id) || 0
+    const shouldChange = bowlingManager.shouldChangeBowler(currentBowler, currentSpell, matchState)
+    
+    if (shouldChange) {
+      // Rest current bowler
+      bowlingManager.restBowler(currentBowler, currentOver)
+      
+      // Select next bowler
+      const nextBowler = bowlingManager.selectNextBowler(currentOver, matchState, currentBowler)
+      matchState.bowler = nextBowler
+      matchState.currentBowlerOvers = 0
+    }
   }
   
   // Restart match
   const handleRestartMatch = () => {
     setMatchState(null)
     setProbabilityEngine(null)
+    setBowlingManager(null)
     setTossResult(null)
     setShowSessionSummary(false)
+    setShowInningsSummary(false)
     initializeMatch()
   }
   
@@ -358,31 +419,14 @@ const TestMatchLive = ({ onNavigate }) => {
     )
   }
   
-  // Innings break screen
-  if (matchPhase === 'innings_break') {
-    const inningsJustCompleted = matchState.inningsNumber - 1
-    const inningsData = matchState.allInnings[
-      inningsJustCompleted === 1 ? 'first' :
-      inningsJustCompleted === 2 ? 'second' :
-      inningsJustCompleted === 3 ? 'third' : 'fourth'
-    ]
-    
+  // Innings summary screen
+  if (showInningsSummary && inningsSummaryData) {
     return (
       <TeletextPage pageNumber="P300" title="THE ASHES 2025">
-        <div className="teletext-block teletext-block--cyan">
-          <h2 className="teletext-subtitle" style={{ color: '#000000' }}>
-            END OF INNINGS {inningsJustCompleted}
-          </h2>
-        </div>
-        
-        <div className="teletext-block">
-          <p className="teletext-text teletext-text--yellow" style={{ fontSize: '1.2rem' }}>
-            {inningsData.runs}/{inningsData.wickets} ({inningsData.overs} OV)
-          </p>
-          <p className="teletext-text teletext-text--cyan">
-            🏏 INNINGS {matchState.inningsNumber} STARTING...
-          </p>
-        </div>
+        <InningsSummary
+          {...inningsSummaryData}
+          onContinue={handleContinueFromInnings}
+        />
       </TeletextPage>
     )
   }

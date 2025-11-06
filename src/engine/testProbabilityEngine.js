@@ -277,45 +277,51 @@ export class TestProbabilityEngine {
       fielder: 'the fielder'
     };
     
+    const matchContext = {
+      balls: matchState.balls,
+      score: matchState.score,
+      wickets: matchState.wickets
+    };
+    
     switch (outcome) {
       case 'dot':
         result.runs = 0
-        result.commentary = generateCommentary('dot', players)
+        result.commentary = generateCommentary('dot', players, matchContext)
         break
       case 'single':
         result.runs = 1
-        result.commentary = generateCommentary('single', players)
+        result.commentary = generateCommentary('single', players, matchContext)
         break
       case 'two':
         result.runs = 2
-        result.commentary = generateCommentary('two', players)
+        result.commentary = generateCommentary('two', players, matchContext)
         break
       case 'three':
         result.runs = 3
-        result.commentary = generateCommentary('three', players)
+        result.commentary = generateCommentary('three', players, matchContext)
         break
       case 'four':
         result.runs = 4
-        result.commentary = generateCommentary('four', players)
+        result.commentary = generateCommentary('four', players, matchContext)
         break
       case 'six':
         result.runs = 6
-        result.commentary = generateCommentary('six', players)
+        result.commentary = generateCommentary('six', players, matchContext)
         break
       case 'wicket':
         result.isWicket = true
         result.wicketType = this.determineWicketType(bowler.bowling.style)
-        result.commentary = generateCommentary('wicket', players, {}, result.wicketType)
+        result.commentary = generateCommentary('wicket', players, matchContext, result.wicketType)
         break
       case 'wide':
         result.runs = 1
         result.isLegalDelivery = false
-        result.commentary = generateCommentary('wide', players)
+        result.commentary = generateCommentary('wide', players, matchContext)
         break
       case 'no_ball':
         result.runs = 1
         result.isLegalDelivery = false
-        result.commentary = generateCommentary('noBall', players)
+        result.commentary = generateCommentary('noBall', players, matchContext)
         break
     }
     

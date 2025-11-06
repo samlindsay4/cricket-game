@@ -170,3 +170,73 @@ export function calculateProjectedScore(matchState) {
   const totalBalls = matchState.totalOvers * 6
   return Math.round(currentRunRate * (totalBalls / 6))
 }
+
+/**
+ * Get top batsmen sorted by runs scored
+ * @param {Map} batsmanStats - Map of batsman stats
+ * @param {Array} players - Array of player objects
+ * @param {number} limit - Number of batsmen to return (default 5)
+ * @returns {Array} Top batsmen with stats
+ */
+export function getTopBatsmen(batsmanStats, players, limit = 5) {
+  const batsmenWithStats = []
+  
+  for (const [playerId, stats] of batsmanStats.entries()) {
+    const player = players.find(p => p.id === playerId)
+    if (player && stats.balls > 0) {
+      batsmenWithStats.push({
+        name: player.name,
+        runs: stats.runs,
+        balls: stats.balls,
+        fours: stats.fours || 0,
+        sixes: stats.sixes || 0,
+        isOut: stats.isOut || false
+      })
+    }
+  }
+  
+  // Sort by runs (descending)
+  batsmenWithStats.sort((a, b) => b.runs - a.runs)
+  
+  return batsmenWithStats.slice(0, limit)
+}
+
+/**
+ * Get top bowlers sorted by wickets then economy
+ * @param {Map} bowlerStats - Map of bowler stats
+ * @param {Array} players - Array of player objects
+ * @param {number} limit - Number of bowlers to return (default 5)
+ * @returns {Array} Top bowlers with stats
+ */
+export function getTopBowlers(bowlerStats, players, limit = 5) {
+  const bowlersWithStats = []
+  
+  for (const [playerId, stats] of bowlerStats.entries()) {
+    const player = players.find(p => p.id === playerId)
+    if (player && stats.balls > 0) {
+      const overs = Math.floor(stats.balls / 6)
+      const ballsInOver = stats.balls % 6
+      const oversStr = ballsInOver > 0 ? `${overs}.${ballsInOver}` : `${overs}`
+      const economy = ((stats.runs / stats.balls) * 6).toFixed(2)
+      
+      bowlersWithStats.push({
+        name: player.name,
+        wickets: stats.wickets || 0,
+        runs: stats.runs,
+        overs: oversStr,
+        economy: parseFloat(economy),
+        maidens: stats.maidens || 0
+      })
+    }
+  }
+  
+  // Sort by wickets (descending), then by economy (ascending)
+  bowlersWithStats.sort((a, b) => {
+    if (b.wickets !== a.wickets) {
+      return b.wickets - a.wickets
+    }
+    return a.economy - b.economy
+  })
+  
+  return bowlersWithStats.slice(0, limit)
+}

@@ -2,15 +2,12 @@ import React from 'react'
 import TeletextButton from './TeletextButton'
 
 /**
- * SessionSummary Component
- * Display summary at end of each session (Lunch, Tea, Stumps)
+ * InningsSummary Component
+ * Display summary at end of each innings
  */
-const SessionSummary = ({ 
-  day, 
-  session, 
+const InningsSummary = ({ 
+  inningsNumber,
   teamName,
-  sessionRuns,
-  sessionWickets,
   totalRuns,
   totalWickets,
   overs,
@@ -18,43 +15,20 @@ const SessionSummary = ({
   topBowlers,
   onContinue
 }) => {
-  const getSessionLabel = (sess) => {
-    switch (sess) {
-      case 1:
-        return 'SESSION 1 - MORNING';
-      case 2:
-        return 'SESSION 2 - AFTERNOON';
-      case 3:
-        return 'SESSION 3 - EVENING';
-      default:
-        return 'SESSION';
-    }
-  }
-
-  const getBreakLabel = (sess) => {
-    switch (sess) {
-      case 1:
-        return 'LUNCH';
-      case 2:
-        return 'TEA';
-      case 3:
-        return 'STUMPS';
-      default:
-        return 'BREAK';
-    }
-  }
-
   return (
     <div className="teletext-block">
-      <div className="teletext-block teletext-block--yellow" style={{ marginBottom: '1rem' }}>
+      <div className="teletext-block teletext-block--cyan" style={{ marginBottom: '1rem' }}>
         <h2 className="teletext-subtitle" style={{ color: '#000000' }}>
-          {getSessionLabel(session)} SUMMARY - DAY {day}
+          END OF INNINGS {inningsNumber}
         </h2>
       </div>
 
       <div className="teletext-block teletext-block--blue" style={{ marginBottom: '1rem' }}>
-        <div style={{ fontSize: '1.2rem', color: '#FFFF00', textAlign: 'center' }}>
-          {teamName}: {totalRuns}/{totalWickets} ({overs} OVERS)
+        <div style={{ fontSize: '1.4rem', color: '#FFFF00', textAlign: 'center' }}>
+          {teamName}: {totalRuns}/{totalWickets}
+        </div>
+        <div style={{ fontSize: '1rem', color: '#00FF00', textAlign: 'center', marginTop: '0.3rem' }}>
+          ({overs} OVERS)
         </div>
       </div>
 
@@ -82,29 +56,22 @@ const SessionSummary = ({
         </div>
       )}
 
-      <div className="teletext-block teletext-block--cyan" style={{ marginBottom: '1rem' }}>
+      <div className="teletext-block teletext-block--yellow" style={{ marginBottom: '1rem' }}>
         <div style={{ color: '#000000', textAlign: 'center', fontSize: '1.1rem' }}>
-          ═══ {getBreakLabel(session)} ═══
+          🏏 INNINGS COMPLETE 🏏
         </div>
-        {session === 3 && (
-          <div style={{ color: '#000000', textAlign: 'center', marginTop: '0.3rem' }}>
-            PLAY RESUMES DAY {day + 1}
-          </div>
-        )}
-        {session < 3 && (
-          <div style={{ color: '#000000', textAlign: 'center', marginTop: '0.3rem' }}>
-            PLAY RESUMES SHORTLY
-          </div>
-        )}
+        <div style={{ color: '#000000', textAlign: 'center', marginTop: '0.3rem' }}>
+          NEXT INNINGS STARTING...
+        </div>
       </div>
 
       <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
         <TeletextButton color="green" onClick={onContinue}>
-          {session === 3 ? '[CONTINUE TO DAY ' + (day + 1) + ']' : '[CONTINUE]'}
+          [CONTINUE TO INNINGS {inningsNumber + 1}]
         </TeletextButton>
       </div>
     </div>
   )
 }
 
-export default SessionSummary
+export default InningsSummary
