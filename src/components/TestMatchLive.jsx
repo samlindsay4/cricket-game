@@ -285,7 +285,7 @@ const TestMatchLive = ({ onNavigate }) => {
       const inningsSummary = `END OF INNINGS: ${matchState.battingTeam.name} ${matchState.score}/${matchState.wickets}`
       matchState.commentary.push(inningsSummary)
       
-      // CRITICAL FIX: Call switchInnings() - this handles innings victory in testMatchSimulator.js
+      // CRITICAL FIX: Call switchInnings() - this handles innings victory checks in testMatchSimulator.js switchInnings() method
       matchState.switchInnings()
       
       // AFTER switching, check if match became complete
