@@ -62,11 +62,40 @@ const SessionSummary = ({
       {topBatsmen && topBatsmen.length > 0 && (
         <div className="teletext-block" style={{ marginBottom: '1rem' }}>
           <h3 className="teletext-subtitle" style={{ color: '#00FF00' }}>TOP BATSMEN:</h3>
-          {topBatsmen.map((batsman, idx) => (
-            <div key={idx} style={{ fontSize: '0.9rem', marginTop: '0.3rem', color: '#FFFFFF', fontFamily: 'monospace' }}>
-              {idx + 1}. {batsman.name.padEnd(20)} {batsman.runs}{batsman.isOut ? '' : '*'} ({batsman.balls})
-            </div>
-          ))}
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: '2fr 1fr 1fr',
+            gap: '0.5rem',
+            marginTop: '0.5rem'
+          }}>
+            {topBatsmen.map((batsman, idx) => (
+              <React.Fragment key={idx}>
+                <div style={{ 
+                  fontSize: '0.9rem', 
+                  color: batsman.isOut ? '#FFFFFF' : '#FFFF00',
+                  fontFamily: 'monospace' 
+                }}>
+                  {batsman.name}{batsman.isOut ? '' : '*'}
+                </div>
+                <div style={{ 
+                  fontSize: '0.9rem', 
+                  color: '#00FF00', 
+                  textAlign: 'right',
+                  fontFamily: 'monospace' 
+                }}>
+                  {batsman.runs}
+                </div>
+                <div style={{ 
+                  fontSize: '0.9rem', 
+                  color: '#FFFFFF', 
+                  textAlign: 'right',
+                  fontFamily: 'monospace' 
+                }}>
+                  ({batsman.balls})
+                </div>
+              </React.Fragment>
+            ))}
+          </div>
         </div>
       )}
 
@@ -74,11 +103,40 @@ const SessionSummary = ({
       {topBowlers && topBowlers.length > 0 && (
         <div className="teletext-block" style={{ marginBottom: '1rem' }}>
           <h3 className="teletext-subtitle" style={{ color: '#FF00FF' }}>TOP BOWLERS:</h3>
-          {topBowlers.map((bowler, idx) => (
-            <div key={idx} style={{ fontSize: '0.9rem', marginTop: '0.3rem', color: '#FFFFFF', fontFamily: 'monospace' }}>
-              {idx + 1}. {bowler.name.padEnd(20)} {bowler.wickets}/{bowler.runs} ({bowler.overs} ov)
-            </div>
-          ))}
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: '2fr 1fr 1fr',
+            gap: '0.5rem',
+            marginTop: '0.5rem'
+          }}>
+            {topBowlers.map((bowler, idx) => (
+              <React.Fragment key={idx}>
+                <div style={{ 
+                  fontSize: '0.9rem', 
+                  color: '#FFFFFF',
+                  fontFamily: 'monospace' 
+                }}>
+                  {bowler.name}
+                </div>
+                <div style={{ 
+                  fontSize: '0.9rem', 
+                  color: '#00FF00', 
+                  textAlign: 'right',
+                  fontFamily: 'monospace' 
+                }}>
+                  {bowler.wickets}/{bowler.runs}
+                </div>
+                <div style={{ 
+                  fontSize: '0.9rem', 
+                  color: '#FFFFFF', 
+                  textAlign: 'right',
+                  fontFamily: 'monospace' 
+                }}>
+                  ({bowler.overs} ov)
+                </div>
+              </React.Fragment>
+            ))}
+          </div>
         </div>
       )}
 

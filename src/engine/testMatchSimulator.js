@@ -19,6 +19,10 @@ import { formatScore, ballsToOvers, checkMilestone } from './matchUtils.js';
 import { BALL_OUTCOMES, WICKET_TYPES } from './matchConstants.js';
 import { Player, PLAYER_ROLES } from './playerStats.js';
 
+// Test cricket constants
+const FOLLOW_ON_THRESHOLD = 200; // Runs behind to enforce follow-on
+const FOLLOW_ON_ENFORCE_MARGIN = 250; // Enforce follow-on if trail is this large
+
 /**
  * Test Match State - extends MatchState for Test cricket
  */
@@ -218,14 +222,41 @@ export class TestMatchState extends MatchState {
     
     this.inningsNumber++;
     
-    // Determine next batting team
-    if (this.inningsNumber === 2 || this.inningsNumber === 4) {
-      // Same teams, switch roles
+    // CRITICAL FIX: Correct Test cricket innings order
+    // Innings 1: Team1 bats
+    // Innings 2: Team2 bats (swap)
+    // Innings 3: Team1 bats again (swap back)
+    // Innings 4: Team2 bats again (swap)
+    
+    if (this.inningsNumber === 2) {
+      // After 1st innings: swap teams (Team2 bats)
+      const temp = this.battingTeam;
+      this.battingTeam = this.bowlingTeam;
+      this.bowlingTeam = temp;
+      
+    } else if (this.inningsNumber === 3) {
+      // After 2nd innings: Check for follow-on
+      const trail = this.allInnings.first.runs - this.allInnings.second.runs;
+      const followOnPossible = trail >= FOLLOW_ON_THRESHOLD;
+      
+      if (followOnPossible && this.shouldEnforceFollowOn(trail)) {
+        // Follow-on enforced: Team batting 2nd bats again (DON'T swap)
+        this.followOnEnforced = true;
+        // battingTeam and bowlingTeam stay the same
+        
+      } else {
+        // Normal: Team who batted 1st bats again (swap back)
+        const temp = this.battingTeam;
+        this.battingTeam = this.bowlingTeam;
+        this.bowlingTeam = temp;
+      }
+      
+    } else if (this.inningsNumber === 4) {
+      // After 3rd innings: swap for 4th innings
       const temp = this.battingTeam;
       this.battingTeam = this.bowlingTeam;
       this.bowlingTeam = temp;
     }
-    // For innings 3, teams switch back (team1 bats again)
     
     // Reset innings stats
     this.score = 0;
@@ -238,6 +269,17 @@ export class TestMatchState extends MatchState {
     this.batsmanStats.clear();
     this.bowlerStats.clear();
     this.declared = false;
+  }
+  
+  /**
+   * Decide if follow-on should be enforced
+   * @param {number} trail - Runs behind
+   * @returns {boolean} True if follow-on should be enforced
+   */
+  shouldEnforceFollowOn(trail) {
+    // Simple logic: enforce if trail is very large
+    // This gives the batting team a chance to tire out opposition
+    return trail >= FOLLOW_ON_ENFORCE_MARGIN;
   }
 
   /**

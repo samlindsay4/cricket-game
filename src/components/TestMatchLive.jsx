@@ -270,7 +270,38 @@ const TestMatchLive = ({ onNavigate }) => {
     
     // Switch innings in background
     setTimeout(() => {
+      // Add innings summary commentary before switching
+      const inningsSummary = `END OF INNINGS: ${matchState.battingTeam.name} ${matchState.score}/${matchState.wickets}`
+      matchState.commentary.push(inningsSummary)
+      
       matchState.switchInnings()
+      
+      // Clear "waiting for match to begin" message if present
+      matchState.commentary = matchState.commentary.filter(c => 
+        !c.toLowerCase().includes('waiting for match')
+      )
+      
+      // Add proper innings start commentary
+      if (matchState.inningsNumber === 2) {
+        const trail = matchState.allInnings.first.runs;
+        matchState.commentary.push(`${matchState.battingTeam.name} begin their reply...`);
+        matchState.commentary.push(`They need ${trail + 1} runs to avoid follow-on`);
+      } else if (matchState.inningsNumber === 3) {
+        if (matchState.followOnEnforced) {
+          matchState.commentary.push(`FOLLOW-ON ENFORCED!`);
+          matchState.commentary.push(`${matchState.battingTeam.name} bat again...`);
+        } else {
+          matchState.commentary.push(`3rd innings begins...`);
+          matchState.commentary.push(`${matchState.battingTeam.name} bat again`);
+        }
+      } else if (matchState.inningsNumber === 4) {
+        // Target = (Team1's 1st + Team1's 2nd) - (Team2's 1st) + 1
+        const team1Total = matchState.allInnings.first.runs + matchState.allInnings.third.runs;
+        const team2Total = matchState.allInnings.second.runs;
+        const target = team1Total - team2Total + 1;
+        matchState.commentary.push(`FINAL INNINGS`);
+        matchState.commentary.push(`${matchState.battingTeam.name} need ${target} runs to win`);
+      }
       
       // Initialize new innings batsmen
       matchState.initializeBatsmen(matchState.battingTeam.players)
@@ -294,24 +325,25 @@ const TestMatchLive = ({ onNavigate }) => {
     if (!bowlingManager) return
     
     const currentOver = Math.floor(matchState.balls / 6)
-    const currentBowler = matchState.bowler
+    const previousBowler = matchState.bowler
     
     // Update spell tracking for current bowler
-    bowlingManager.updateSpell(currentBowler, currentOver)
+    bowlingManager.updateSpell(previousBowler, currentOver)
     
-    // Check if bowler should be changed
-    const currentSpell = bowlingManager.currentSpells.get(currentBowler.id) || 0
-    const shouldChange = bowlingManager.shouldChangeBowler(currentBowler, currentSpell, matchState)
+    // Check if bowler should be rested (end of spell)
+    const currentSpell = bowlingManager.currentSpells.get(previousBowler.id) || 0
+    const shouldRest = bowlingManager.shouldChangeBowler(previousBowler, currentSpell, matchState)
     
-    if (shouldChange) {
-      // Rest current bowler
-      bowlingManager.restBowler(currentBowler, currentOver)
-      
-      // Select next bowler
-      const nextBowler = bowlingManager.selectNextBowler(currentOver, matchState, currentBowler)
-      matchState.bowler = nextBowler
-      matchState.currentBowlerOvers = 0
+    if (shouldRest) {
+      // Rest current bowler (marks them as needing extended rest)
+      bowlingManager.restBowler(previousBowler, currentOver)
     }
+    
+    // ALWAYS select next bowler (can't bowl consecutive overs)
+    // Pass previousBowler to ensure they are excluded from selection
+    const nextBowler = bowlingManager.selectNextBowler(currentOver, matchState, previousBowler)
+    matchState.bowler = nextBowler
+    matchState.currentBowlerOvers = 0
   }
   
   // Restart match
@@ -441,19 +473,68 @@ const TestMatchLive = ({ onNavigate }) => {
           <h2 className="teletext-subtitle">MATCH COMPLETE</h2>
         </div>
         
-        <div className="teletext-block teletext-block--yellow">
-          <p className="teletext-text teletext-text--black" style={{ fontSize: '1.2rem' }}>
-            {result.description}
-          </p>
+        {/* Match Result in teletext table format */}
+        <div className="teletext-block" style={{ marginTop: '1rem' }}>
+          <h3 className="teletext-subtitle" style={{ color: '#00FFFF', marginBottom: '0.5rem' }}>FINAL SCORES</h3>
+          
+          {/* Display all innings scores in table format */}
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: '2fr 1fr',
+            gap: '0.3rem',
+            fontSize: '0.9rem',
+            fontFamily: 'monospace'
+          }}>
+            {matchState.allInnings.first && (
+              <>
+                <div style={{ color: '#FFFFFF' }}>
+                  {team1Data.name} 1ST INNINGS
+                </div>
+                <div style={{ color: '#00FF00', textAlign: 'right' }}>
+                  {matchState.allInnings.first.runs}/{matchState.allInnings.first.wickets}
+                </div>
+              </>
+            )}
+            
+            {matchState.allInnings.second && (
+              <>
+                <div style={{ color: '#FFFFFF' }}>
+                  {team2Data.name} 1ST INNINGS
+                </div>
+                <div style={{ color: '#00FF00', textAlign: 'right' }}>
+                  {matchState.allInnings.second.runs}/{matchState.allInnings.second.wickets}
+                </div>
+              </>
+            )}
+            
+            {matchState.allInnings.third && (
+              <>
+                <div style={{ color: '#FFFFFF' }}>
+                  {team1Data.name} 2ND INNINGS
+                </div>
+                <div style={{ color: '#00FF00', textAlign: 'right' }}>
+                  {matchState.allInnings.third.runs}/{matchState.allInnings.third.wickets}
+                </div>
+              </>
+            )}
+            
+            {matchState.allInnings.fourth && (
+              <>
+                <div style={{ color: '#FFFFFF' }}>
+                  {team2Data.name} 2ND INNINGS
+                </div>
+                <div style={{ color: '#00FF00', textAlign: 'right' }}>
+                  {matchState.allInnings.fourth.runs}/{matchState.allInnings.fourth.wickets}
+                </div>
+              </>
+            )}
+          </div>
         </div>
         
-        <div className="teletext-block">
-          <h3 className="teletext-subtitle">FINAL SCORES</h3>
-          <p className="teletext-text">
-            {matchState.allInnings.first && `${team1Data.name}: ${matchState.allInnings.first.runs}/${matchState.allInnings.first.wickets} & ${matchState.allInnings.third?.runs || 0}/${matchState.allInnings.third?.wickets || 0}`}
-          </p>
-          <p className="teletext-text">
-            {matchState.allInnings.second && `${team2Data.name}: ${matchState.allInnings.second.runs}/${matchState.allInnings.second.wickets} & ${matchState.allInnings.fourth?.runs || 0}/${matchState.allInnings.fourth?.wickets || 0}`}
+        {/* Result text in colored block */}
+        <div className="teletext-block teletext-block--yellow" style={{ marginTop: '1rem' }}>
+          <p className="teletext-text teletext-text--black" style={{ fontSize: '1.2rem', textAlign: 'center' }}>
+            {result.description}
           </p>
         </div>
         
