@@ -8,6 +8,7 @@ import TeletextButton from './TeletextButton'
 import { TestMatchState, simulateTestBall } from '../engine/testMatchSimulator.js'
 import { TestProbabilityEngine } from '../engine/testProbabilityEngine.js'
 import { MatchConditions } from '../engine/matchConditions.js'
+import { BowlingManager } from '../engine/bowlingManager.js'
 import { getEnglandSquad, getAustraliaSquad, selectTestXI, getBowlers, performToss } from '../utils/ashesHelpers.js'
 import { ballsToOvers } from '../engine/matchUtils.js'
 import { getTopBatsmen, getTopBowlers } from '../utils/matchHelpers.js'
@@ -19,6 +20,7 @@ import { getTopBatsmen, getTopBowlers } from '../utils/matchHelpers.js'
 const TestMatchLive = ({ onNavigate }) => {
   const [matchState, setMatchState] = useState(null)
   const [probabilityEngine, setProbabilityEngine] = useState(null)
+  const [bowlingManager, setBowlingManager] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSimulating, setIsSimulating] = useState(false)
   const [matchPhase, setMatchPhase] = useState('toss')
@@ -79,14 +81,18 @@ const TestMatchLive = ({ onNavigate }) => {
       // Initialize batsmen
       newMatchState.initializeBatsmen(battingTeam.players)
       
-      // Set initial bowler
+      // Set initial bowler and create bowling manager
       const bowlers = getBowlers(bowlingTeam.players)
+      const manager = new BowlingManager(bowlers)
+      
       if (bowlers.length > 0) {
-        newMatchState.bowler = bowlers[0]
+        newMatchState.bowler = manager.selectNextBowler(0, newMatchState, null)
+        newMatchState.currentBowlerOvers = 0
       }
       
       setMatchState(newMatchState)
       setProbabilityEngine(engine)
+      setBowlingManager(manager)
       setMatchPhase('playing')
       setIsLoading(false)
     } catch (error) {
@@ -269,34 +275,53 @@ const TestMatchLive = ({ onNavigate }) => {
       // Initialize new innings batsmen
       matchState.initializeBatsmen(matchState.battingTeam.players)
       
-      // Set initial bowler
+      // Set initial bowler and reset bowling manager
       const bowlers = getBowlers(matchState.bowlingTeam.players)
+      const manager = new BowlingManager(bowlers)
+      
       if (bowlers.length > 0) {
-        matchState.bowler = bowlers[0]
+        matchState.bowler = manager.selectNextBowler(0, matchState, null)
         matchState.currentBowlerOvers = 0
       }
       
+      setBowlingManager(manager)
       setMatchState(Object.assign(Object.create(Object.getPrototypeOf(matchState)), matchState))
     }, 1000)
   }
   
-  // Rotate bowler
+  // Rotate bowler using BowlingManager
   const rotateBowler = () => {
-    const bowlers = getBowlers(matchState.bowlingTeam.players)
-    if (bowlers.length === 0) return
+    if (!bowlingManager) return
     
-    const currentIndex = bowlers.findIndex(b => b.id === matchState.bowler.id)
-    const nextIndex = (currentIndex + 1) % Math.min(5, bowlers.length)
-    matchState.bowler = bowlers[nextIndex]
-    matchState.currentBowlerOvers = 0
+    const currentOver = Math.floor(matchState.balls / 6)
+    const currentBowler = matchState.bowler
+    
+    // Update spell tracking for current bowler
+    bowlingManager.updateSpell(currentBowler, currentOver)
+    
+    // Check if bowler should be changed
+    const currentSpell = bowlingManager.currentSpells.get(currentBowler.id) || 0
+    const shouldChange = bowlingManager.shouldChangeBowler(currentBowler, currentSpell, matchState)
+    
+    if (shouldChange) {
+      // Rest current bowler
+      bowlingManager.restBowler(currentBowler, currentOver)
+      
+      // Select next bowler
+      const nextBowler = bowlingManager.selectNextBowler(currentOver, matchState, currentBowler)
+      matchState.bowler = nextBowler
+      matchState.currentBowlerOvers = 0
+    }
   }
   
   // Restart match
   const handleRestartMatch = () => {
     setMatchState(null)
     setProbabilityEngine(null)
+    setBowlingManager(null)
     setTossResult(null)
     setShowSessionSummary(false)
+    setShowInningsSummary(false)
     initializeMatch()
   }
   
