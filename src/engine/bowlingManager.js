@@ -10,10 +10,10 @@
  */
 
 // Spell length limits
-const MAX_PACE_SPELL = 10      // Maximum spell length for pace bowlers
-const MAX_SPIN_SPELL = 15      // Maximum spell length for spinners
-const STANDARD_PACE_SPELL = 8  // Standard rotation for pace bowlers
-const STANDARD_SPIN_SPELL = 12 // Standard rotation for spinners
+const MAX_PACE_SPELL = 10      // ABSOLUTE maximum for pace bowlers (even if bowling well)
+const MAX_SPIN_SPELL = 20      // Spinners can bowl longer
+const STANDARD_PACE_SPELL = 8  // Normal rotation for pace bowlers
+const STANDARD_SPIN_SPELL = 15 // Normal rotation for spinners
 
 /**
  * BowlingManager class - manages bowling rotation and spells
@@ -302,43 +302,42 @@ export class BowlingManager {
     // Get bowler stats
     const bowlerStats = matchState.getBowlerStats(bowler)
     
-    // CRITICAL FIX: Enforce maximum spell lengths
-    // Pace bowlers: max 10 overs per spell
-    // Spinners: max 15 overs per spell
+    // CRITICAL FIX: ABSOLUTE maximum spell lengths (CANNOT be exceeded)
+    // Fast/seam bowlers: MAX 10 overs per spell
+    // Spinners: MAX 20 overs per spell
     if (isPace && currentSpell >= MAX_PACE_SPELL) {
-      return true // Max spell length for pace bowlers
+      return true // MUST rest - absolute maximum reached
     }
     
     if (isSpin && currentSpell >= MAX_SPIN_SPELL) {
-      return true // Max spell length for spinners
+      return true // MUST rest - absolute maximum reached
     }
     
-    // CRITICAL FIX: Don't remove successful bowlers (unless they've hit max spell)
+    // Keep successful bowlers on (but only up to max spell length checked above)
     if (bowlerStats && bowlerStats.balls >= 36) { // At least 6 overs
-      // Check if bowler is taking wickets (2+ in current spell)
+      // Check if bowler is taking wickets (2+ wickets)
       const wicketsInSpell = bowlerStats.wickets
-      if (wicketsInSpell >= 2) {
+      if (wicketsInSpell >= 2 && currentSpell < MAX_PACE_SPELL - 2) {
         // Keep them on! They're taking wickets
-        // Already checked max spell above, so they can continue
+        // But start thinking about rest when within 2 overs of max
         return false
       }
       
       // Check if bowling economically (under 2.5 runs/over in Tests)
       const economy = bowlerStats.balls > 0 ? (bowlerStats.runs / bowlerStats.balls) * 6 : 0
-      if (economy < 2.5) {
+      if (economy < 2.5 && currentSpell < MAX_PACE_SPELL - 2) {
         // Keep them on! They're bowling economically
-        // Already checked max spell above, so they can continue
         return false
       }
     }
     
-    // Check spell length (standard rotation)
+    // Standard rotation (normal spell lengths for fast bowlers)
     if (isPace && currentSpell >= STANDARD_PACE_SPELL) {
-      return true // Pace bowlers need rest after 8 overs (if not successful)
+      return true // Rest after 8 overs if not bowling exceptionally
     }
     
     if (isSpin && currentSpell >= STANDARD_SPIN_SPELL) {
-      return true // Spinners can bowl longer spells
+      return true // Spinners rest after 15 overs
     }
     
     // Check fitness (if available)
@@ -346,11 +345,11 @@ export class BowlingManager {
       return true
     }
     
-    // Check if bowler is very expensive (economy > 5 in Tests)
+    // Check if bowler is very expensive (economy > 5.5 in Tests)
     if (bowlerStats && bowlerStats.balls >= 36) { // At least 6 overs
       const economy = bowlerStats.balls > 0 ? (bowlerStats.runs / bowlerStats.balls) * 6 : 0
-      if (economy > 5.5) {
-        return true
+      if (economy > 5.5 && currentSpell >= 4) {
+        return true // Remove expensive bowlers after 4+ overs
       }
     }
     
@@ -439,17 +438,37 @@ export class BowlingManager {
   
   /**
    * Reset spell tracking for session breaks (lunch, tea, stumps)
-   * Bowlers can start fresh spells after breaks
+   * IMPORTANT: Don't fully reset - allow continuation but track cumulative spell
    */
   resetSpellsForSessionBreak() {
-    // Reset current spell lengths - bowlers start fresh after break
+    // DON'T reset current spell lengths - we want to track cumulative overs
+    // Bowlers can bowl max 10-12 overs total even if split across lunch/tea
+    
+    // Just clear the "resting since" so bowlers can bowl again after break
+    for (const bowler of this.allBowlers) {
+      this.restingSince.set(bowler.id, null)
+    }
+    
+    // IMPORTANT: Keep currentSpells tracking - this accumulates overs within the day
+    // Only reset spells at END of day (stumps)
+    
+    // Don't reset two-end system - bowlers continue from same ends after break
+    // Don't reset total overs bowled - that's for the whole day
+  }
+  
+  /**
+   * Reset spell tracking at end of day (stumps)
+   * Fresh start for new day
+   */
+  resetSpellsForEndOfDay() {
+    // Reset current spell lengths - fresh start for new day
     for (const bowler of this.allBowlers) {
       this.currentSpells.set(bowler.id, 0)
       this.restingSince.set(bowler.id, null)
     }
     
-    // Don't reset two-end system - bowlers can continue from same ends
-    // Don't reset total overs bowled - that's for the whole day
+    // Don't reset total overs - that's per day tracking
+    // Don't reset two-end system
   }
 }
 
