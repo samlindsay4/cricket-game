@@ -217,15 +217,15 @@ export class BowlingManager {
       return true // Spinners can bowl longer spells
     }
     
-    // Check fitness
-    if (bowler.fitness < 60) {
+    // Check fitness (if available)
+    if (bowler.fitness !== undefined && bowler.fitness < 60) {
       return true
     }
     
     // Check if bowler is very expensive (economy > 5 in Tests)
     const bowlerStats = matchState.getBowlerStats(bowler)
-    if (bowlerStats.balls >= 36) { // At least 6 overs
-      const economy = (bowlerStats.runs / bowlerStats.balls) * 6
+    if (bowlerStats && bowlerStats.balls >= 36) { // At least 6 overs
+      const economy = bowlerStats.balls > 0 ? (bowlerStats.runs / bowlerStats.balls) * 6 : 0
       if (economy > 5.5) {
         return true
       }
